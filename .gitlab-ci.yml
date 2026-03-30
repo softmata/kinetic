@@ -153,8 +153,9 @@ pages:
   image: rust:latest
   needs: []
   script:
-    - cargo install mdbook || true
-    - cargo install mdbook-mermaid || true
+    - cargo install mdbook --version 0.4.44
+    - cargo install mdbook-mermaid --version 0.17.0
+    - export PATH="$CARGO_HOME/bin:$PATH"
     - cd docs-site && mdbook build -d ../public && cd ..
   artifacts:
     paths:
