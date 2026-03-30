@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <lnik name="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+   ="100"/>
+  </joint>
+</robot>

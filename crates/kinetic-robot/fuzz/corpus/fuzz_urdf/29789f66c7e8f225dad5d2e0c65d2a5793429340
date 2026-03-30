@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+   xyn/>
+  <link name="tip"/>
+  <joint name="j0" Itype="revOlute">
+    <parent liute">
+    <parent link="base"/>
+    <child link="ti&"/>
+    <orig xyn="1.0"?>
+<rob1oint

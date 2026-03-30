@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ro type="revolute">
+    <parent link="base"/>
+ %  <child link="tip"/>
+    <origin xyz="0 0 0.1"/>
+    <axis xy</axis x
+</robot>

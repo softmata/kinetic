@@ -1,0 +1,44 @@
+[robot]
+name = "kuka_iiwa7"
+urdf = "iiwa7.urdf"
+dof = 7
+
+[planning_group.arm]
+chain = ["iiwa_link_0", "iiwa_link_ee"]
+
+[end_effector.flange]
+parent_link = "iiwa_link_ee"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ready = [0.0, 0.5236, 0.0, -1.0472, 0.0, 0.5236, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01
+# IIWA7 at zero config is fully upright — sphere approximations overlap
+# extensively between non-adjacent links due to compact 7-DOF design.
+skip_pairs = [
+    ["iiwa_link_0", "iiwa_link_2"],
+    ["iiwa_link_0", "iiwa_link_4"],
+    ["iiwa_link_0", "iiwa_link_5"],
+    ["iiwa_link_0", "iiwa_link_6"],
+    ["iiwa_link_1", "iiwa_link_4"],
+    ["iiwa_link_1", "iiwa_link_5"],
+    ["iiwa_link_1", "iiwa_link_6"],
+    ["iiwa_link_1", "iiwa_link_7"],
+    ["iiwa_link_2", "iiwa_link_4"],
+    ["iiwa_link_2", "iiwa_link_5"],
+    ["iiwa_link_2", "iiwa_link_6"],
+    ["iiwa_link_2", "iiwa_link_7"],
+    ["iiwa_link_3", "iiwa_link_7"],
+    ["iiwa_link_4", "iiwa_link_6"],
+    ["iiwa_link_4", "iiwa_link_7"],
+    ["iiwa_link_5", "iiwa_link_7"],
+]

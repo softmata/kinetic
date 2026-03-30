@@ -1,0 +1,10 @@
+<?xml version="1.1"?>
+<robot name="|wo_link">
+  0.1nk na"/>
+    <child link="tip"/>
+    <origin xyz="0 0 0.1"/>
+    <axis xyz="0 0 1"/>
+<?xmllina version="2.0"?>
+<robot name="two_link">
+  xllina version="2.0"?>
+<robot nam<on=e="ame"0

@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!-- Trossen PincherX-100 URDF - 4-DOF tabletop arm, no meshes -->
+<!-- Joint axes: Z, Y, Y, Y -->
+<!-- DH: d=[0.0893, 0, 0, 0.065], a=[0, 0.1039, 0.1, 0] -->
+<robot name="trossen_px100">
+  <link name="base_link">
+    <inertial>
+      <mass value="0.4"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="waist" type="revolute">
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <origin xyz="0 0 0.0893" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159" effort="6.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="shoulder_link">
+    <inertial>
+      <mass value="0.25"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0003"/>
+    </inertial>
+  </link>
+
+  <joint name="shoulder" type="revolute">
+    <parent link="shoulder_link"/>
+    <child link="upper_arm_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.9722" upper="1.9722" effort="6.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="upper_arm_link">
+    <inertial>
+      <mass value="0.15"/>
+      <inertia ixx="0.0003" ixy="0.0" ixz="0.0" iyy="0.0003" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="elbow" type="revolute">
+    <parent link="upper_arm_link"/>
+    <child link="forearm_link"/>
+    <origin xyz="0.1039 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.9722" upper="1.9722" effort="4.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="forearm_link">
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0002" ixy="0.0" ixz="0.0" iyy="0.0002" iyz="0.0" izz="0.00008"/>
+    </inertial>
+  </link>
+
+  <joint name="wrist_angle" type="revolute">
+    <parent link="forearm_link"/>
+    <child link="wrist_link"/>
+    <origin xyz="0.1 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.7453" upper="1.7453" effort="3.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="wrist_link">
+    <inertial>
+      <mass value="0.06"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.00005" iyz="0.0" izz="0.00005"/>
+    </inertial>
+  </link>
+
+  <joint name="ee_fixed" type="fixed">
+    <parent link="wrist_link"/>
+    <child link="end_effector_link"/>
+    <origin xyz="0.065 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="end_effector_link">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

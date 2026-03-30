@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+U0df = "test.urdf"
+dof = 2
+
+[planning_group.arm]
+_hai_ = ]name"]

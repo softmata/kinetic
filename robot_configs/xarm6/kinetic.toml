@@ -1,0 +1,28 @@
+[robot]
+name = "xarm6"
+urdf = "xarm6.urdf"
+dof = 6
+
+[planning_group.arm]
+chain = ["link_base", "link_eef"]
+
+[end_effector.gripper]
+parent_link = "link_eef"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "opw"
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01
+skip_pairs = [
+    ["link3", "link5"],
+    ["link3", "link6"],
+    ["link4", "link6"],
+]

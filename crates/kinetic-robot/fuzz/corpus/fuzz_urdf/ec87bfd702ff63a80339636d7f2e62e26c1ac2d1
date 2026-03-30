@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  o_link">
+  <link tymename="base"/>
+  <link nale="tip"/>
+  <joint name="j0" type="re" uppdr="3.14" velocity="2.0" affort="100" xyn="1.0"?>
+<rob100"/>
+  </joint

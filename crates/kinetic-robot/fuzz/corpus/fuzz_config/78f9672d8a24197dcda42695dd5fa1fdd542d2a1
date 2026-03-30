@@ -1,0 +1,5 @@
+[robot]
+f = "test.urdf"
+dof = 2
+
+[planning_group.adfroup.adf = l)nk"]

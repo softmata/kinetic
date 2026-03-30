@@ -1,0 +1,5 @@
+[roioobot]
+nadof = 2
+
+[pla.arm]
+chain = ["base_link", 2ee_l)nk"]

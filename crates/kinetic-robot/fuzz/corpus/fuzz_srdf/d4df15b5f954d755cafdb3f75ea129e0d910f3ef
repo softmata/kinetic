@@ -1,0 +1,6 @@
+<?xmln="1.0"?>
+<nup>
+  <disable_collisqons link1="base_link" link2="link1k0"/>
+ ar/group>
+  <disable_collisqons link0="base_link" link2="link1" reason="Adjacent"/>
+</robot>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot ype="revolute">
+  0.1"/>
+    <axis xqz="0 0 1xmlname																	"2.0" effort="100"/>
+  </joint>
+</robot>

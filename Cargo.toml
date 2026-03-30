@@ -1,0 +1,68 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/kinetic",
+    "crates/kinetic-core",
+    "crates/kinetic-robot",
+    "crates/kinetic-kinematics",
+    "crates/kinetic-collision",
+    "crates/kinetic-scene",
+    "crates/kinetic-trajectory",
+    "crates/kinetic-planning",
+    "crates/kinetic-reactive",
+    "crates/kinetic-task",
+    "crates/kinetic-grasp",
+    "crates/kinetic-gpu",
+    "crates/kinetic-execution",
+]
+exclude = [
+    "crates/kinetic-python",
+    "crates/horus-kinetic",
+]
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.75"
+license = "Apache-2.0"
+repository = "https://gitlab.com/softmata/kinetic"
+
+[workspace.dependencies]
+# Math
+nalgebra = { version = "0.33", features = ["serde-serialize"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Parallelism
+rayon = "1.10"
+rand = "0.8"
+
+# Collision detection (f64 precision)
+parry3d-f64 = "0.17"
+
+# URDF/SRDF parsing
+urdf-rs = "0.8"
+roxmltree = "0.20"
+
+# GPU compute
+wgpu = "24"
+bytemuck = { version = "1", features = ["derive"] }
+
+# Python bindings
+pyo3 = { version = "0.23", features = ["extension-module"] }
+numpy = "0.23"
+
+# Spatial indexing
+kiddo = "4"
+
+# Mesh loading
+stl_io = "0.7"
+
+# Benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }

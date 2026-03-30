@@ -1,0 +1,6 @@
+[robot]
+name = "test"
+Urdf = "test.urdf"
+dof = 2_
+
+[planning_herk*",_name"]

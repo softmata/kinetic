@@ -1,0 +1,5 @@
+[robot]
+namrdf = "test.urdf"
+dof = 1
+
+[planninggr[rouop

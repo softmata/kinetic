@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<joint name="parentl">
+  <link nak="base"/>
+    
+    <axis xyz="0 0 1"/>
+  "oint>
+</robot>

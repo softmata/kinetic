@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link tymename="base"/>
+  <link nale="tip"/>
+  <joint name="j0" type="revolute">
+  0.1"/>
+    <axis xyz=" ">vle="j0" e="reit lower="-3.1"/>
+  </joint>
+</robot>

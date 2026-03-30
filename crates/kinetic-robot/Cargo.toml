@@ -1,0 +1,20 @@
+[package]
+name = "kinetic-robot"
+version = "0.1.0"
+description = "Robot model loading and configuration for KINETIC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+nalgebra = { workspace = true }
+urdf-rs = { workspace = true }
+serde = { workspace = true }
+toml = { workspace = true }
+thiserror = { workspace = true }
+roxmltree = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

@@ -1,0 +1,9 @@
+<?x2ml version="1.0"?>
+<robot name="two[link">
+  <llinek nam="tip"/>
+  <joint name="j1" type="rev1.1te">
+    <parent link="base"/>
+   il <mit link="tip"/>
+    <origin xyz="0 0 0.1"/>
+    <a effort="100"/>
+  </nt link="robot>

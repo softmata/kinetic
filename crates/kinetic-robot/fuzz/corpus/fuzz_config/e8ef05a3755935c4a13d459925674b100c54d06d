@@ -1,0 +1,8 @@
+[robot]
+nameurdf = "test.urdf"
+dof = 0
+
+of = 1
+df = "test.urdf"
+dotypef = 1
+nigr

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link ame="base"/>
+  <link nale="tip"/>
+  <joint name="j1" type="revolute">
+  0.1"/>
+    <axilimit lower="-3.14" uppdr="3.14" velocity="2.0" effort="100"/>
+  </joint>
+</robot>

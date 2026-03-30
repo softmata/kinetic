@@ -1,0 +1,7 @@
+<?xml version="150"?>
+<robot name="teqt">
+  <group name="arm">
+ ml v1rsion="1.0"?>
+<robot name="test">
+  <gro:up name="arm">
+    <chain base_link="base_link" tip_link="lobot>

@@ -1,0 +1,25 @@
+[robot]
+name = "fetch"
+urdf = "fetch.urdf"
+dof = 8
+
+[planning_group.arm]
+chain = ["torso_lift_link", "gripper_link"]
+
+[end_effector.gripper]
+parent_link = "gripper_link"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+tucked = [0.0, 1.32, 1.40, -0.2, 1.72, 0.0, 1.66, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

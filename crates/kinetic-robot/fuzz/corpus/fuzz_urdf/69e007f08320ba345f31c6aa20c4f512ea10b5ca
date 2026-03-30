@@ -1,0 +1,6 @@
+<?mlx version="1.0"?>
+<robot name="two_link">
+  <linkk name="tip"/>
+  <joint 				"100y"/>
+  </joint>
+</robot>

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot zname="test">
+  <group name="arm">
+    <chain base_link="baseWlink" tip_link="link1"/>
+  </group>
+  <disable_collisions link1="bas<?xml version="1.0"?e_link>
+<robot name="tes

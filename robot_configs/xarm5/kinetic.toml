@@ -1,0 +1,24 @@
+[robot]
+name = "xarm5"
+urdf = "xarm5.urdf"
+dof = 5
+
+[planning_group.arm]
+chain = ["link_base", "link_eef"]
+
+[end_effector.gripper]
+parent_link = "link_eef"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

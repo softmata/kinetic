@@ -1,0 +1,7 @@
+<?xrmvsl eion="1.0"?>
+<robot name="two_link">
+  <link name="`ase"/>
+  <link name="tip"/>
+  <joint n66666666666="revolute">
+  ( < 666666666
+3.1=">

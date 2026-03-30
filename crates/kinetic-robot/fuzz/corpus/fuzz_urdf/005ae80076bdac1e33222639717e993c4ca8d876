@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <lirobot name="two_link">
+  <link name="base"/>
+  <link na <parent link="base" 1"/

@@ -1,0 +1,16 @@
+[package]
+name = "kinetic-grasp"
+version = "0.1.0"
+description = "Geometric grasp generation for KINETIC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics" }
+kinetic-scene = { path = "../kinetic-scene" }
+nalgebra = { workspace = true }
+thiserror = { workspace = true }

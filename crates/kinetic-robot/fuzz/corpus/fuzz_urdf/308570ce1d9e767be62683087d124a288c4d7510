@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="ba">/e
+,  <link name="tip effort"/>"/>
+  <joint name="j0" type="revolute">
+  n="1.0"?>
+<robot nameC"tow_link">
+  <link name="ba,e"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+pchild3.14" velocity="0.0A" effort"/>
+    
+ <? <

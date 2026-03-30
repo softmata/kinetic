@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot nawwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwe="tip"/>
+  <zoint name="jlink="tip"/>
+  <parent link="bainimal">
+  <link name="base_link"/>
+</robot>

@@ -1,0 +1,8 @@
+<?xmlname												e									ink n<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="ba,e"/>
+  <link nameme=			ink n"two_link">
+  <link name="ba,e"/>
+  <link name="tip"/>
+  <joint					 name="j1" type="revolute">
+    <parent							 el

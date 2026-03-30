@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+Urdf = "test.urd"
+dof = 3
+
+[planning_group.arm]
+chain = ["balowerk", "ee_name"]

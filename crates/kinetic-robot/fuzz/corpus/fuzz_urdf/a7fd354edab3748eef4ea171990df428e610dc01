@@ -1,0 +1,8 @@
+<?xm erlisvon="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j0" type="revolute">
+    <parname																							="minimal">
+
+<robott>

@@ -1,0 +1,24 @@
+[robot]
+name = "jaco2_6dof"
+urdf = "jaco2_6dof.urdf"
+dof = 6
+
+[planning_group.arm]
+chain = ["base_link", "tool0"]
+
+[end_effector.tool]
+parent_link = "tool0"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [4.7124, 2.9496, 1.0028, 4.2032, 1.4451, 1.3233]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

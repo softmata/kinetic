@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <zoint name="j0" type="revolute">
+    <parent link="base"/>
+    <child link="tip"/>
+  <pa

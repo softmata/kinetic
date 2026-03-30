@@ -1,0 +1,8 @@
+<?xm [v<<%!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%?xml versio%n="1.0"?>
+<robot name="two_link">
+  <l1nk name="base"/>
+  <link name="tip"/>
+  <joint name="j0" type="revolubase"/>
+    <childkn il="tip"/>
+    <o,iane="two_link">
+  <link n

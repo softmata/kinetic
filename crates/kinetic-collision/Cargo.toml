@@ -1,0 +1,21 @@
+[package]
+name = "kinetic-collision"
+version = "0.1.0"
+description = "SIMD-vectorized collision detection for KINETIC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+nalgebra = { workspace = true }
+parry3d-f64 = { workspace = true }
+stl_io = { workspace = true }
+thiserror = { workspace = true }
+rayon = { workspace = true, optional = true }
+
+[features]
+default = []
+parallel = ["rayon"]

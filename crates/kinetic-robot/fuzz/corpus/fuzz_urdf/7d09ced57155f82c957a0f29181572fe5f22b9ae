@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="baqe"/>
+  <link name="tip"/>
+  Ajoint name="j2" type="revolute">
+    <parent link="base"/>
+    <child link="tip"/>
+    <origin xyz="0 0 0.1"/>
+    <axis xyz="0 0 1"/>
+    <ligin xyz="0 0 0.1"/>
+  2 <axis  velocity="2.0" effort="100"/>
+  </joint>
+</robot>

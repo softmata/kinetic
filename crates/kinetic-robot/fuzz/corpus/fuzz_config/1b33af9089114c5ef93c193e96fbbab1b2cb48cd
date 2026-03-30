@@ -1,0 +1,9 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 0
+
+[tla.ning_group.arm]
+c_l/nk"]
+[robot]
+nam

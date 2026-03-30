@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+f = 2
+
+[planning_groupup.arm]
+chain = ["base_link", "ee_link"]

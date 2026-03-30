@@ -1,0 +1,6 @@
+<?xm lveersion="1.0"?>
+<robot name="two_link">
+  <link name="base"> l/ <
+ink name="tip"/>
+  <joint na-e="j2" type="revolute">
+<lower?xml vlink name=evol.1>

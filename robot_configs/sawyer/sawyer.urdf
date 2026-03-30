@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!-- Rethink Robotics Sawyer URDF - 7-DOF research arm, no meshes -->
+<!-- Joint axes: Z, Y, Z, Y, Z, Y, Z (alternating like Panda) -->
+<robot name="sawyer">
+  <link name="base_link">
+    <inertial>
+      <mass value="4.0"/>
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j0" type="revolute">
+    <parent link="base_link"/>
+    <child link="right_l0"/>
+    <origin xyz="0.0811 0.0 0.317" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0503" upper="3.0503" effort="80.0" velocity="1.74"/>
+  </joint>
+
+  <link name="right_l0">
+    <inertial>
+      <mass value="5.3"/>
+      <inertia ixx="0.04" ixy="0.0" ixz="0.0" iyy="0.04" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j1" type="revolute">
+    <parent link="right_l0"/>
+    <child link="right_l1"/>
+    <origin xyz="0.1945 0.0 0.081" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.8095" upper="2.2736" effort="80.0" velocity="1.328"/>
+  </joint>
+
+  <link name="right_l1">
+    <inertial>
+      <mass value="4.5"/>
+      <inertia ixx="0.03" ixy="0.0" ixz="0.0" iyy="0.03" iyz="0.0" izz="0.005"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j2" type="revolute">
+    <parent link="right_l1"/>
+    <child link="right_l2"/>
+    <origin xyz="0.0 0.0 0.3645" rpy="1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0426" upper="3.0426" effort="40.0" velocity="1.957"/>
+  </joint>
+
+  <link name="right_l2">
+    <inertial>
+      <mass value="1.8"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.003"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j3" type="revolute">
+    <parent link="right_l2"/>
+    <child link="right_l3"/>
+    <origin xyz="0.0 0.0 0.080" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0439" upper="3.0439" effort="40.0" velocity="1.957"/>
+  </joint>
+
+  <link name="right_l3">
+    <inertial>
+      <mass value="2.2"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.003"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j4" type="revolute">
+    <parent link="right_l3"/>
+    <child link="right_l4"/>
+    <origin xyz="0.0 0.0 0.3735" rpy="1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.9761" upper="2.9761" effort="9.0" velocity="3.485"/>
+  </joint>
+
+  <link name="right_l4">
+    <inertial>
+      <mass value="1.4"/>
+      <inertia ixx="0.005" ixy="0.0" ixz="0.0" iyy="0.005" iyz="0.0" izz="0.002"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j5" type="revolute">
+    <parent link="right_l4"/>
+    <child link="right_l5"/>
+    <origin xyz="0.0 0.0 0.010" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.9761" upper="2.9761" effort="9.0" velocity="3.485"/>
+  </joint>
+
+  <link name="right_l5">
+    <inertial>
+      <mass value="1.2"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.003" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="right_j6" type="revolute">
+    <parent link="right_l5"/>
+    <child link="right_l6"/>
+    <origin xyz="0.0 0.0 0.1597" rpy="1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-4.7124" upper="4.7124" effort="9.0" velocity="4.545"/>
+  </joint>
+
+  <link name="right_l6">
+    <inertial>
+      <mass value="0.4"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <joint name="right_hand" type="fixed">
+    <parent link="right_l6"/>
+    <child link="right_hand_link"/>
+    <origin xyz="0.0 0.0 0.0245" rpy="0 0 0"/>
+  </joint>
+
+  <link name="right_hand_link">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+</robot>

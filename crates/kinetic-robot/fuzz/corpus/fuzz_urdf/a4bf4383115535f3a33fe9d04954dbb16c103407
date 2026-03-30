@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<rnbot name="two_link">
+  <link name="base"/>
+  <link Name="tip"/>
+  <jsjoint>
+</robot?xml version="1.0"?>
+<rnbot name="two_link">
+>

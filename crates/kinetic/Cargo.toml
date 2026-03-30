@@ -1,0 +1,82 @@
+[package]
+name = "kinetic"
+version = "0.1.0"
+description = "Fast, Rust-native motion planning stack for robotics"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["robotics", "motion-planning", "kinematics", "inverse-kinematics", "collision"]
+categories = ["science::robotics", "algorithms"]
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics" }
+kinetic-collision = { path = "../kinetic-collision" }
+kinetic-planning = { path = "../kinetic-planning" }
+kinetic-trajectory = { path = "../kinetic-trajectory" }
+kinetic-scene = { path = "../kinetic-scene" }
+kinetic-reactive = { path = "../kinetic-reactive" }
+kinetic-task = { path = "../kinetic-task" }
+kinetic-grasp = { path = "../kinetic-grasp" }
+kinetic-gpu = { path = "../kinetic-gpu" }
+kinetic-execution = { path = "../kinetic-execution" }
+nalgebra = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+rand = { workspace = true }
+rand_chacha = "0.3"
+proptest = "1"
+kinetic-dynamics = { path = "../kinetic-dynamics" }
+
+[[bench]]
+name = "fk"
+harness = false
+
+[[bench]]
+name = "ik"
+harness = false
+
+[[bench]]
+name = "collision"
+harness = false
+
+[[bench]]
+name = "planning"
+harness = false
+
+[[bench]]
+name = "trajectory"
+harness = false
+
+[[bench]]
+name = "reactive"
+harness = false
+
+[[bench]]
+name = "full_pipeline"
+harness = false
+
+[[bench]]
+name = "motionbenchmaker"
+harness = false
+
+[[example]]
+name = "hello_fk_ik"
+
+[[example]]
+name = "multiple_ik"
+
+[[example]]
+name = "collision_check"
+
+[[example]]
+name = "servo_loop"
+
+[[example]]
+name = "grasp_planning"
+
+[[example]]
+name = "gpu_optimize"

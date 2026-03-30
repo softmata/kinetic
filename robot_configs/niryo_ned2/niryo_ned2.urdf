@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+<!-- Niryo Ned2 URDF - 6-DOF educational/light industrial robot, OPW-compatible, no meshes -->
+<!-- Joint axes: Z, Y, Y, Z, Y, Z -->
+<!-- DH: d=[0.1836, 0, 0, 0.0308, 0, 0.026], a=[0, 0.210, 0.030, 0, 0, 0] -->
+<robot name="niryo_ned2">
+  <link name="base_link">
+    <inertial>
+      <mass value="1.8"/>
+      <inertia ixx="0.005" ixy="0.0" ixz="0.0" iyy="0.005" iyz="0.0" izz="0.005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.1836" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="10.0" velocity="3.49"/>
+  </joint>
+
+  <link name="link_1">
+    <inertial>
+      <mass value="0.6"/>
+      <inertia ixx="0.002" ixy="0.0" ixz="0.0" iyy="0.002" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_2" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="0.8203" effort="10.0" velocity="3.49"/>
+  </joint>
+
+  <link name="link_2">
+    <inertial>
+      <mass value="0.7"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.003" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_3" type="revolute">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0.210 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.3963" upper="1.5708" effort="5.0" velocity="3.49"/>
+  </joint>
+
+  <link name="link_3">
+    <inertial>
+      <mass value="0.3"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_4" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <origin xyz="0.030 0 0.0308" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.0543" upper="3.0543" effort="3.0" velocity="5.24"/>
+  </joint>
+
+  <link name="link_4">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0003" ixy="0.0" ixz="0.0" iyy="0.0003" iyz="0.0" izz="0.0002"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_5" type="revolute">
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.7453" upper="1.7453" effort="3.0" velocity="5.24"/>
+  </joint>
+
+  <link name="link_5">
+    <inertial>
+      <mass value="0.12"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_6" type="revolute">
+    <parent link="link_5"/>
+    <child link="link_6"/>
+    <origin xyz="0 0 0.026" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.5744" upper="2.5744" effort="2.0" velocity="5.24"/>
+  </joint>
+
+  <link name="link_6">
+    <inertial>
+      <mass value="0.06"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.00005" iyz="0.0" izz="0.00005"/>
+    </inertial>
+  </link>
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <parent link="link_6"/>
+    <child link="tool0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool0">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

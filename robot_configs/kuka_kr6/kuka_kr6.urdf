@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!-- Simplified KUKA KR6 R700 URDF - correct kinematics, no meshes -->
+<!-- Joint axes: Z, Y, Y, Y, Z, Y (standard 6-DOF industrial) -->
+<!-- DH: d=[0.400, 0, 0, 0.365, 0, 0.080], a=[0.025, 0.315, 0.035, 0, 0, 0] -->
+<robot name="kuka_kr6">
+  <link name="base_link">
+    <inertial>
+      <mass value="6.0"/>
+      <inertia ixx="0.05" ixy="0.0" ixz="0.0" iyy="0.05" iyz="0.0" izz="0.04"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.400" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.9671" upper="2.9671" effort="176" velocity="3.49"/>
+  </joint>
+
+  <link name="link_1">
+    <inertial>
+      <mass value="7.3"/>
+      <inertia ixx="0.04" ixy="0.0" ixz="0.0" iyy="0.04" iyz="0.0" izz="0.02"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_2" type="revolute">
+    <parent link="link_1"/>
+    <child link="link_2"/>
+    <origin xyz="0.025 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.3161" upper="0.7854" effort="176" velocity="3.49"/>
+  </joint>
+
+  <link name="link_2">
+    <inertial>
+      <mass value="6.5"/>
+      <inertia ixx="0.03" ixy="0.0" ixz="0.0" iyy="0.03" iyz="0.0" izz="0.015"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_3" type="revolute">
+    <parent link="link_2"/>
+    <child link="link_3"/>
+    <origin xyz="0.315 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.0944" upper="2.7227" effort="98.1" velocity="4.01"/>
+  </joint>
+
+  <link name="link_3">
+    <inertial>
+      <mass value="2.3"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_4" type="revolute">
+    <parent link="link_3"/>
+    <child link="link_4"/>
+    <origin xyz="0.035 0 0.365" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.2289" upper="3.2289" effort="54" velocity="5.76"/>
+  </joint>
+
+  <link name="link_4">
+    <inertial>
+      <mass value="0.8"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.003" iyz="0.0" izz="0.002"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_5" type="revolute">
+    <parent link="link_4"/>
+    <child link="link_5"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.0944" upper="2.0944" effort="54" velocity="5.15"/>
+  </joint>
+
+  <link name="link_5">
+    <inertial>
+      <mass value="0.6"/>
+      <inertia ixx="0.002" ixy="0.0" ixz="0.0" iyy="0.002" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_6" type="revolute">
+    <parent link="link_5"/>
+    <child link="link_6"/>
+    <origin xyz="0 0 0.080" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-6.1087" upper="6.1087" effort="29.4" velocity="7.85"/>
+  </joint>
+
+  <link name="link_6">
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0003"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_6_tool0" type="fixed">
+    <parent link="link_6"/>
+    <child link="tool0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool0">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

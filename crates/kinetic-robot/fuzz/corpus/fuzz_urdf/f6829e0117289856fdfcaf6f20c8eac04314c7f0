@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="ba,e"/>
+  1 type="revolute">
+    <parent link="base"/>
+    /child link="t>
+  ! <origin xyz="5 0 0.1"/>
+  2 <axis xyz="0 0 owe
+="-link"ort="100"/>
+  </axis </r/robot>

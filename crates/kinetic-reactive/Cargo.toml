@@ -1,0 +1,23 @@
+[package]
+name = "kinetic-reactive"
+version = "0.1.0"
+description = "Reactive control for KINETIC: RMP policies and Servo mode"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics" }
+kinetic-scene = { path = "../kinetic-scene" }
+nalgebra = { workspace = true }
+thiserror = { workspace = true }
+
+# Aegis PID controller (optional — use aegis PID instead of internal servo gains)
+aegis = { version = "0.3.0", path = "../../../aegis", optional = true, features = ["softmata"] }
+
+[features]
+default = []
+aegis-control = ["dep:aegis"]

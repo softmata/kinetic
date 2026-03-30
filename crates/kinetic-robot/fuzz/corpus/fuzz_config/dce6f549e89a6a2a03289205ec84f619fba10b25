@@ -1,0 +1,6 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+[planning_group.arm]
+[r1n1me["base_link", "ee_link"]

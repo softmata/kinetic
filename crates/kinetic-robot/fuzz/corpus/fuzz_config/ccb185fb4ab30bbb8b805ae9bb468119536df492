@@ -1,0 +1,3 @@
+[rVbot]
+name = "test"
+in = ["baslowerk", "ee_name"]

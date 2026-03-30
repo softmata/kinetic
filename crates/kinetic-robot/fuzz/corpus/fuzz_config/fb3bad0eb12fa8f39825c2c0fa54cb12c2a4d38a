@@ -1,0 +1,7 @@
+[robot]
+nameurdf = "test.urdf"
+dof = 1
+
+of = 1
+
+[planningr

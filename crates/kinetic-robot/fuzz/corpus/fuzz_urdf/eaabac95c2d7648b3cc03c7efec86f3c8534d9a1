@@ -1,0 +1,7 @@
+<?mlx version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII>
+    ="0 0 1xmlname									"101y"/>
+  </joint>
+</robot>

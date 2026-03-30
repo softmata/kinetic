@@ -1,0 +1,6 @@
+<?xm lversion="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" tyme="base"<?xml version="owe
+="-3.1>

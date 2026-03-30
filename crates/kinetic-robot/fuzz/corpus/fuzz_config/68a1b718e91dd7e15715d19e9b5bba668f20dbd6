@@ -1,0 +1,6 @@
+[robot]
+name = "test"
+urdf = "te1111111"
+dof = 2
+
+[plgnain111 k"]

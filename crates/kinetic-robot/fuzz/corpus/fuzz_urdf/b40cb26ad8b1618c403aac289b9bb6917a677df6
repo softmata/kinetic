@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot naee="two_linkr" upper="3.14" velocity="2.0" effo="0 0 1"/>
+    <limit lower= lower="lower" upper="3.14" ve2.0" effort="10/">1
+  </joint>
+</robot>

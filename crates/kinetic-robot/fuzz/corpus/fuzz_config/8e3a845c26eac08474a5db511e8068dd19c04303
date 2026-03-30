@@ -1,0 +1,6 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+
+[pla~ning_gr= ["base_link", "ee_l)nk"]

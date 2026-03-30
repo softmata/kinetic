@@ -1,0 +1,6 @@
+<?mlx version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <l1xmlname									"100y"/>
+  </joint>
+</robot>

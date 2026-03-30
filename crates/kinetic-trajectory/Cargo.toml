@@ -1,0 +1,21 @@
+[package]
+name = "kinetic-trajectory"
+version = "0.1.0"
+description = "Trajectory processing and time parameterization for KINETIC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+nalgebra = { workspace = true }
+serde_json = { workspace = true }
+
+# Aegis trajectory math (optional — use aegis trapezoidal/S-curve/spline instead of internal)
+aegis = { version = "0.3.0", path = "../../../aegis", optional = true, features = ["softmata"] }
+
+[features]
+default = []
+# Use aegis trajectory generators instead of internal implementations
+aegis-trajectory = ["dep:aegis"]

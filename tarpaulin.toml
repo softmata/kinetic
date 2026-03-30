@@ -1,0 +1,25 @@
+[default]
+# Workspace-level tarpaulin configuration for KINETIC
+workspace = true
+exclude-files = ["crates/kinetic-gpu/*", "crates/kinetic-python/*", "crates/horus-kinetic/*"]
+packages = [
+    "kinetic",
+    "kinetic-core",
+    "kinetic-robot",
+    "kinetic-kinematics",
+    "kinetic-collision",
+    "kinetic-scene",
+    "kinetic-trajectory",
+    "kinetic-planning",
+    "kinetic-reactive",
+    "kinetic-task",
+    "kinetic-grasp",
+    "kinetic-execution",
+]
+timeout = 600
+skip-clean = true
+engine = "llvm"
+
+[report]
+out = ["html", "stdout"]
+output-dir = "coverage"

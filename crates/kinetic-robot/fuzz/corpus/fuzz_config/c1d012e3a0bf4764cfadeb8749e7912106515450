@@ -1,0 +1,5 @@
+[robot]
+name = "test"
+Urdf = "test.urdf"
+dof = 4_
+"]

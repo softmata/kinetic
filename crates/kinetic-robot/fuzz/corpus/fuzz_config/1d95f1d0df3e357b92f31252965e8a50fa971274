@@ -1,0 +1,3 @@
+[robot]
+name = "test"
+in = ["baslowerk", "ee_name"]

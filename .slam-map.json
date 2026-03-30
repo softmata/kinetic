@@ -1,0 +1,156 @@
+{
+  "project": "kinetic",
+  "version": 1,
+  "cycle": 1,
+  "regions_mapped": 15,
+  "regions_total": 15,
+  "current_region": "dynamics-bridge",
+  "features": {
+    "core-types": {
+      "intent": "Canonical SE(3), velocity, force, trajectory, and planning types shared across all kinetic crates",
+      "crate": "kinetic-core",
+      "tests_before": 96,
+      "tests_after": 96,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "robot-model": {
+      "intent": "Load robot kinematic trees from URDF/MJCF/SDF with planning group configuration",
+      "crate": "kinetic-robot",
+      "tests_before": 126,
+      "tests_after": 126,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "kinematics": {
+      "intent": "FK, Jacobian, 6 IK solvers, workspace analysis for arbitrary robot chains",
+      "crate": "kinetic-kinematics",
+      "tests_before": 154,
+      "tests_after": 154,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "collision": {
+      "intent": "SIMD-vectorized sphere collision with CAPT broadphase, CCD, SDF, and LOD tiers",
+      "crate": "kinetic-collision",
+      "tests_before": 152,
+      "tests_after": 152,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "planning": {
+      "intent": "8 motion planning algorithms with post-processing and composable pipeline",
+      "crate": "kinetic-planning",
+      "tests_before": 365,
+      "tests_after": 365,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "trajectory": {
+      "intent": "Time parameterization (TOTP, trapezoidal, S-curve), validation, and monitoring",
+      "crate": "kinetic-trajectory",
+      "tests_before": 111,
+      "tests_after": 111,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "scene": {
+      "intent": "Planning scene with objects, attached objects, point clouds, octrees, and collision queries",
+      "crate": "kinetic-scene",
+      "tests_before": 71,
+      "tests_after": 71,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "reactive": {
+      "intent": "Riemannian Motion Policies and servo teleoperation with collision deceleration",
+      "crate": "kinetic-reactive",
+      "tests_before": 96,
+      "tests_after": 96,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "task": {
+      "intent": "High-level task composition (pick/place/sequence) with DAG stage engine and recovery",
+      "crate": "kinetic-task",
+      "tests_before": 50,
+      "tests_after": 50,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "grasp": {
+      "intent": "Geometric grasp generation for parallel jaw and suction grippers with quality ranking",
+      "crate": "kinetic-grasp",
+      "tests_before": 21,
+      "tests_after": 33,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "execution": {
+      "intent": "Real-time trajectory execution with multi-controller management and e-stop",
+      "crate": "kinetic-execution",
+      "tests_before": 40,
+      "tests_after": 40,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "gpu": {
+      "intent": "GPU trajectory optimization with parallel seeds via wgpu compute shaders",
+      "crate": "kinetic-gpu",
+      "tests_before": 13,
+      "tests_after": 32,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "dynamics": {
+      "intent": "Bridge to featherstone dynamics for torque feasibility, gravity comp, and mass matrix",
+      "crate": "kinetic-dynamics",
+      "tests_before": 3,
+      "tests_after": 27,
+      "verdict": "GOOD",
+      "last_scanned": "2026-03-25"
+    },
+    "perception": {
+      "intent": "OctoMap-style depth perception pipeline with octree, point cloud processing, and object recognition",
+      "crate": "kinetic-perception",
+      "tests_before": 84,
+      "tests_after": 84,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    },
+    "viewer": {
+      "intent": "3D scene graph, trajectory playback, interactive markers, and wgpu renderer",
+      "crate": "kinetic-viewer",
+      "tests_before": 30,
+      "tests_after": 30,
+      "verdict": "PARTIAL",
+      "last_scanned": "2026-03-25"
+    }
+  },
+  "integration_tests": {
+    "before": 40,
+    "after": 41,
+    "new_files": ["test_dynamics_integration.rs"]
+  },
+  "tests_generated": 203,
+  "bugs_found_by_tests": 0,
+  "false_test_failures": 2,
+  "cycles_completed": 10,
+  "last_updated": "2026-03-25",
+  "tests_by_crate": {
+    "kinetic-core": {"before": 96, "after": 125, "delta": 29},
+    "kinetic-robot": {"before": 126, "after": 136, "delta": 10},
+    "kinetic-kinematics": {"before": 154, "after": 165, "delta": 11},
+    "kinetic-collision": {"before": 152, "after": 191, "delta": 11},
+    "kinetic-trajectory": {"before": 111, "after": 117, "delta": 6},
+    "kinetic-scene": {"before": 71, "after": 81, "delta": 10},
+    "kinetic-reactive": {"before": 96, "after": 96, "delta": 0},
+    "kinetic-grasp": {"before": 21, "after": 33, "delta": 12},
+    "kinetic-execution": {"before": 40, "after": 53, "delta": 13},
+    "kinetic-gpu": {"before": 13, "after": 32, "delta": 19},
+    "kinetic-dynamics": {"before": 3, "after": 27, "delta": 24},
+    "kinetic-perception": {"before": 84, "after": 94, "delta": 4},
+    "kinetic-task": {"before": 50, "after": 59, "delta": 9},
+    "integration": {"before": 40, "after": 41, "delta": 1}
+  }
+}

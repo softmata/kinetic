@@ -1,0 +1,4 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = ["base_link", "ee_link"]

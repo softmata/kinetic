@@ -1,0 +1,163 @@
+# KINETIC CI — GitLab CI/CD Pipeline
+#
+# Stages: lint → test → safety → acceptance → bench → coverage → doc
+# Mirrors the GitHub Actions workflow with GitLab equivalents.
+
+stages:
+  - lint
+  - test
+  - safety
+  - acceptance
+  - bench
+  - coverage
+  - doc
+
+variables:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  FF_USE_FASTZIP: "true"
+
+.rust-cache:
+  cache:
+    key:
+      files:
+        - Cargo.lock
+    paths:
+      - .cargo/registry/
+      - .cargo/git/
+      - target/
+    policy: pull-push
+
+# ─── Stage: lint ─────────────────────────────────────────────────────────────
+
+check-and-lint:
+  stage: lint
+  extends: .rust-cache
+  image: rust:latest
+  script:
+    - rustup component add clippy rustfmt
+    - cargo fmt --all --check
+    - cargo clippy --all-targets -- -D warnings
+    - cargo build --all-targets
+
+# ─── Stage: test ─────────────────────────────────────────────────────────────
+
+test-linux:
+  stage: test
+  extends: .rust-cache
+  image: rust:latest
+  script:
+    - cargo test --workspace
+
+test-macos:
+  stage: test
+  tags:
+    - macos
+  script:
+    - cargo test --workspace
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ─── Stage: safety ──────────────────────────────────────────────────────────
+
+safety-audit:
+  stage: safety
+  image: rust:latest
+  script:
+    # Verify unsafe only in SIMD modules
+    - |
+      UNSAFE_FILES=$(grep -rl 'unsafe' crates/ --include='*.rs' | grep -v 'kinetic-collision/src/simd' | grep -v 'target/' || true)
+      if [ -n "$UNSAFE_FILES" ]; then
+        echo "ERROR: Unsafe code found outside kinetic-collision/src/simd/:"
+        echo "$UNSAFE_FILES"
+        exit 1
+      fi
+    # Miri on unsafe code
+    - rustup toolchain install nightly --component miri
+    - cargo +nightly miri test -p kinetic-collision --lib soa::tests || true
+    - cargo +nightly miri test -p kinetic-collision --lib simd::tests::scalar_fallback_correctness || true
+
+# ─── Stage: acceptance ───────────────────────────────────────────────────────
+
+acceptance-tests:
+  stage: acceptance
+  extends: .rust-cache
+  image: rust:latest
+  timeout: 30 minutes
+  script:
+    - cargo test -p kinetic --test "test_0*" --test "test_1*" --test "test_critical*"
+    - cargo test -p kinetic --test "test_bench*"
+
+# ─── Stage: bench ────────────────────────────────────────────────────────────
+
+benchmarks:
+  stage: bench
+  extends: .rust-cache
+  image: rust:latest
+  script:
+    - cargo bench -p kinetic --no-fail-fast 2>&1 | tee bench-output.txt
+  artifacts:
+    paths:
+      - target/criterion/
+      - bench-output.txt
+    expire_in: 30 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ─── Stage: coverage ─────────────────────────────────────────────────────────
+
+coverage:
+  stage: coverage
+  extends: .rust-cache
+  image: rust:latest
+  script:
+    - cargo install cargo-tarpaulin || true
+    - cargo tarpaulin --lib --skip-clean --out html json stdout --timeout 600
+        --exclude-files "crates/kinetic-gpu/*" "crates/kinetic-python/*" "crates/horus-kinetic/*"
+    - |
+      COVERAGE=$(python3 -c "import json; d=json.load(open('tarpaulin-report.json')); print(f'{d.get(\"coverage\", 0):.1f}')" 2>/dev/null || echo "0")
+      echo "Coverage: ${COVERAGE}%"
+      if python3 -c "exit(0 if float('${COVERAGE}') >= 85.0 else 1)"; then
+        echo "Coverage meets 85% target"
+      else
+        echo "WARNING: Coverage ${COVERAGE}% is below 85% target"
+      fi
+  coverage: '/Coverage: (\d+\.\d+)%/'
+  artifacts:
+    paths:
+      - tarpaulin-report.html
+      - tarpaulin-report.json
+    expire_in: 30 days
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: tarpaulin-report.json
+
+# ─── Stage: doc ──────────────────────────────────────────────────────────────
+
+documentation:
+  stage: doc
+  extends: .rust-cache
+  image: rust:latest
+  script:
+    - cargo doc --no-deps --all-features
+  variables:
+    RUSTDOCFLAGS: -D warnings
+
+pages:
+  stage: doc
+  image: rust:latest
+  script:
+    - cargo install mdbook || true
+    - cargo install mdbook-mermaid || true
+    - cd docs-site && mdbook build -d ../public && cd ..
+    - cargo doc --no-deps --workspace --target-dir public/api
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

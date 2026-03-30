@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+
+[planning_group.aru]
+chain= ["base_linlink", _l)nk"r

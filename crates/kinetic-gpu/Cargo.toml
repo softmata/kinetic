@@ -1,0 +1,24 @@
+[package]
+name = "kinetic-gpu"
+version = "0.1.0"
+description = "GPU trajectory optimization for KINETIC via wgpu compute shaders"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-collision = { path = "../kinetic-collision" }
+kinetic-scene = { path = "../kinetic-scene", optional = true }
+nalgebra = { workspace = true }
+wgpu = { workspace = true }
+bytemuck = { workspace = true }
+thiserror = { workspace = true }
+rand = { workspace = true }
+pollster = "0.4"
+
+[features]
+default = ["scene"]
+scene = ["dep:kinetic-scene"]

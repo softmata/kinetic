@@ -1,0 +1,4 @@
+[robot]
+nadf = "test.urdf"
+dof = 2
+[ =[

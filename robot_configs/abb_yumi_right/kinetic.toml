@@ -1,0 +1,24 @@
+[robot]
+name = "abb_yumi_right"
+urdf = "abb_yumi_right.urdf"
+dof = 7
+
+[planning_group.arm]
+chain = ["base_link", "tool0"]
+
+[end_effector.tool]
+parent_link = "tool0"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, -1.1345, 0.0, 0.5236, 0.0, 0.6981, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

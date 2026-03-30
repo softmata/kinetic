@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="test">
+  <group name="arm">
+    aseWlink" tip_link="link1"/>
+  </group>
+  <disaTTTTT"base_link" /robot>

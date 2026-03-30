@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <liak name="base"/>
+ <joint name					0"/>
+  </joint>
+</robot>

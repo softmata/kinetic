@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="`ase"/>
+  <link name="tip"/>
+  <joint name="b1" type="revolute">
+    < 666666666666666666666666666666666666666666666666xyz="0 0 1"/>link=  <link mit lo/-
+3.1=">

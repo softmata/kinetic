@@ -1,0 +1,4 @@
+[robot]
+nam= "test.urdf"
+dof = 0
+ouop

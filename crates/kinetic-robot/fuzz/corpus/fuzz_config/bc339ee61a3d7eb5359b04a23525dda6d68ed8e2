@@ -1,0 +1,4 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof =nning_gbase_link", "ee_l)nk

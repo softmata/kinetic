@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot zname="test">
+  <group name="arm">
+    <chain base_link="baseWlink" tip_link="link1"/>
+  </gr </grk1="base_link" /robot>

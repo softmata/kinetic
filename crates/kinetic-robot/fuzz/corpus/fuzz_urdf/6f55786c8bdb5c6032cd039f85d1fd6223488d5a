@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="baqe"/>
+<?Aml version="1.ion="1.0"?>
+<?pml veaxis0"?>
+<?pml veaxisn2=<ro"bname="baqe"/>
+  <link name="tip"/>
+  Ajoint  <origin xyz="0 0 0.1"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="lower" upper="3.14" velocity="2.0" effort="100"/>
+  </joint>
+</robot>

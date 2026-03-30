@@ -1,0 +1,24 @@
+[robot]
+name = "tiago"
+urdf = "tiago.urdf"
+dof = 8
+
+[planning_group.arm]
+chain = ["torso_lift_link", "arm_tool_link"]
+
+[end_effector.tool]
+parent_link = "arm_tool_link"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

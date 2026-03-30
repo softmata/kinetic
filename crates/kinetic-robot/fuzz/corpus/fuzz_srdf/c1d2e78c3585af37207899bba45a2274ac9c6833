@@ -1,0 +1,5 @@
+
+  <group name="arm">
+    <chain base_link='baseWlink" tip_link="link1"/>
+  </grou
+  </groupons liisable_collisions link1="base_link" liot>

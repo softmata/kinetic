@@ -1,0 +1,11 @@
+<?xmligin xyz="ype="evtruole">
+    ase"/>
+    ͜hildxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"link="tip"/>
+    <origin xyz="0 0 0.
+palink="tip"/>
+    <origin xyz="0 0 0.1"/>
+    <axis xyz="0 0 1"/>
+    <limit lowe
+="-3.14" upper="3.14" velocity="0.0" effort="100"/>
+  </axis x
+</robot>

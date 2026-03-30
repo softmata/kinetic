@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <type name=&/>
+    <axis xyz="0 0 1"/>
+ 

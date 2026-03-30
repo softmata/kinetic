@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint ny="0.0" effort="100"/>
+  </joint>
+</robot>

@@ -1,0 +1,17 @@
+[package]
+name = "kinetic-core"
+version = "0.1.0"
+description = "Core types for the KINETIC motion planning stack"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+nalgebra = { workspace = true }
+softmata-core = { version = "0.1.0", path = "../../../softmata-core" }
+thiserror = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = "1"

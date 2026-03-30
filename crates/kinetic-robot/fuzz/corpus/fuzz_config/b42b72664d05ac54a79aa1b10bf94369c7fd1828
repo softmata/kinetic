@@ -1,0 +1,5 @@
+f = "tesv.urdf"
+dof = 2
+
+[pla.arm]
+chain = ["base_link", "ee_l)nk"]

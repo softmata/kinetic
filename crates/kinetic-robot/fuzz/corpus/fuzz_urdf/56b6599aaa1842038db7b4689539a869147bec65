@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <lin/>
+  <link name="tip"/>
+  <joint name="j1" type="revolEute">
+    <parent link="base"/>
+    <ch/>
+  < <joint ngin xyz="0t2M
+<robo/:>MMMMMMMMMMMMMM0

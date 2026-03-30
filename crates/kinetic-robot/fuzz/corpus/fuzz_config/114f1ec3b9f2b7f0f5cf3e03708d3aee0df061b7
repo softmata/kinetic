@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+urdf = "tesrdf"
+dof = 2
+
+[planning_group.arm]
+c_ain = ["base_link", "ee_l)nk"]

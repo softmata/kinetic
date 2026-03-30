@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot namme="j1"ype="revolute">
+    <parent liNk="base"/>
+  e"/>
+    <child link="t i <origin xyz="0 0 01"/>
+  <?xml ver

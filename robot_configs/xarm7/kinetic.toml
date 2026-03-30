@@ -1,0 +1,30 @@
+[robot]
+name = "xarm7"
+urdf = "xarm7.urdf"
+dof = 7
+
+[planning_group.arm]
+chain = ["link_base", "link_eef"]
+
+[end_effector.gripper]
+parent_link = "link_eef"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01
+skip_pairs = [
+    ["link2", "link4"],
+    ["link4", "link6"],
+    ["link4", "link7"],
+    ["link5", "link7"],
+]

@@ -1,0 +1,7 @@
+[robot]
+name = "te"
+urdf = "test.urdf"
+dof = 2
+
+[planning_grotyperm]
+chain = ["ease_link", "ee_link"]

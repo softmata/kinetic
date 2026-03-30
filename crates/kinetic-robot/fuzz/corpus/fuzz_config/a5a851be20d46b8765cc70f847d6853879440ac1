@@ -1,0 +1,6 @@
+[rbot]
+nameh= "test"
+urdf = "test.urdf"
+dof1 = 2
+
+[pla]

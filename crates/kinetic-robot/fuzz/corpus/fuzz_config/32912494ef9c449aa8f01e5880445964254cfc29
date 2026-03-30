@@ -1,0 +1,5 @@
+[robot]
+namdof = 1 
+ ff=1
+
+[planningr

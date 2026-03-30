@@ -1,0 +1,6 @@
+[rorot]
+nameh= "test"
+urdf = "test.urtf"
+dof = 2
+
+[ la]

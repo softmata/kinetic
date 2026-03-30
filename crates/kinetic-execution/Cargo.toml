@@ -1,0 +1,14 @@
+[package]
+name = "kinetic-execution"
+version = "0.1.0"
+description = "Trajectory execution pipeline for KINETIC — plan to hardware"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-trajectory = { path = "../kinetic-trajectory" }
+kinetic-robot = { path = "../kinetic-robot" }
+thiserror = { workspace = true }

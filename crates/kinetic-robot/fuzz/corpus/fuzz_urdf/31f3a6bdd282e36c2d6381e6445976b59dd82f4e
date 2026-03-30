@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  evolute">
+  0.1"/>
+   &ma="base"/> name="tip"/>
+  <axis xyz="5 0 1xm<?  it "?>
+lname	<ro				

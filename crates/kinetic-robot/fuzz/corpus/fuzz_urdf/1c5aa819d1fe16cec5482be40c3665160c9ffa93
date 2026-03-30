@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/saxi<link name="/>
+  <joint name="j1" t/>
+$   <origin xyz="0 0 0.1"/>oixt>
+</robot>

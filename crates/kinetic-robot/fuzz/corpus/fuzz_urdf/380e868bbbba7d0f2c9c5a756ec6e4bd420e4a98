@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link tyme="base"/>
+  <link name="tip"/>
+  <joilu/>tip"/>
+  <joint name="j1" oint name="j1" type="r0 1"/>
+    <limit lowe
+="-3.1>

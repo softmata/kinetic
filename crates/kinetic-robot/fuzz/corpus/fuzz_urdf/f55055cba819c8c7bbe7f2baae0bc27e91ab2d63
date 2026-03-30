@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<robot naee="two_linkr" upper="3.14" veloBity="2.0" effort="10/">1
+  </joint>
+</robot>

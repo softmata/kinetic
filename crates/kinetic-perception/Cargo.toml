@@ -1,0 +1,19 @@
+[package]
+name = "kinetic-perception"
+version = "0.1.0"
+description = "Voxel occupancy engine and perception pipeline for KINETIC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+nalgebra = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "perception"
+harness = false

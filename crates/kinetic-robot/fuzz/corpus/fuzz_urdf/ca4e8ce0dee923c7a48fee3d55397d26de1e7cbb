@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <type name="base"/>
+  <link name="tip"/>
+  
+    <child link="tip"/>
+    <orig/>
+    <axis xyz="0 type/>
+ 

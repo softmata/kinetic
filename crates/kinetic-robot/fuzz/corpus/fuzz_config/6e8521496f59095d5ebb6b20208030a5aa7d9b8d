@@ -1,0 +1,7 @@
+[r.bot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+
+[planning_gruop.arm]
+c_ain = me = "tescha, "ee_l)nk"

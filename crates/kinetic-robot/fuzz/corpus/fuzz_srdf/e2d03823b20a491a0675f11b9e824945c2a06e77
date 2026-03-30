@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot em="arm">
+    <chain base_link="baseWlink" tip_link="link0"/>
+n="Adjacent"/>
+</robot>

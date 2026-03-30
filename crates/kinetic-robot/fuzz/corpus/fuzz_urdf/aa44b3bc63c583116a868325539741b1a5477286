@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+<n l ki name="tip"/>
+me="tip"/>
+  <j  <axis xy100"/>
+  </joint>
+</robot>

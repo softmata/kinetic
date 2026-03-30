@@ -1,0 +1,7 @@
+<?xmliversion="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <cIain base_link="baseWlink" tip_link="link1"/>
+  </group>
+  ="isable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
+</robot>

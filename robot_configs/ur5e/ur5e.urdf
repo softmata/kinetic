@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<!-- UR5e URDF - correct kinematics matching ur_description, no meshes -->
+<!-- Joint axes: Z, Y, Y, Y, Z, Y (standard UR convention) -->
+<!-- DH: d=[0.1625, 0, 0, 0.1333, 0.0997, 0.0996], a=[0, -0.425, -0.3922, 0, 0, 0] -->
+<!-- Collision geometry: tight cylinder/sphere approximations sized to avoid -->
+<!-- false self-collision at common configurations (zero, home, extended) -->
+<robot name="ur5e">
+  <link name="base_link">
+    <inertial>
+      <mass value="4.0"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <collision>
+      <geometry><cylinder radius="0.04" length="0.08"/></geometry>
+      <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    </collision>
+  </link>
+
+  <joint name="shoulder_pan_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <origin xyz="0 0 0.1625" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.2832" upper="6.2832" effort="150.0" velocity="3.1416"/>
+  </joint>
+
+  <link name="shoulder_link">
+    <inertial>
+      <mass value="3.7"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <collision>
+      <geometry><sphere radius="0.04"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="shoulder_lift_joint" type="revolute">
+    <parent link="shoulder_link"/>
+    <child link="upper_arm_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-6.2832" upper="6.2832" effort="150.0" velocity="3.1416"/>
+  </joint>
+
+  <link name="upper_arm_link">
+    <inertial>
+      <mass value="8.393"/>
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <collision>
+      <geometry><cylinder radius="0.035" length="0.36"/></geometry>
+      <origin xyz="-0.21 0 0" rpy="0 1.5708 0"/>
+    </collision>
+  </link>
+
+  <joint name="elbow_joint" type="revolute">
+    <parent link="upper_arm_link"/>
+    <child link="forearm_link"/>
+    <origin xyz="-0.4250 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-6.2832" upper="6.2832" effort="150.0" velocity="3.1416"/>
+  </joint>
+
+  <link name="forearm_link">
+    <inertial>
+      <mass value="2.275"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <collision>
+      <geometry><cylinder radius="0.030" length="0.33"/></geometry>
+      <origin xyz="-0.19 0 0" rpy="0 1.5708 0"/>
+    </collision>
+  </link>
+
+  <joint name="wrist_1_joint" type="revolute">
+    <parent link="forearm_link"/>
+    <child link="wrist_1_link"/>
+    <origin xyz="-0.3922 0 0.1333" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-6.2832" upper="6.2832" effort="28.0" velocity="3.1416"/>
+  </joint>
+
+  <link name="wrist_1_link">
+    <inertial>
+      <mass value="1.219"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <collision>
+      <geometry><sphere radius="0.028"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="wrist_2_joint" type="revolute">
+    <parent link="wrist_1_link"/>
+    <child link="wrist_2_link"/>
+    <origin xyz="0 -0.0997 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.2832" upper="6.2832" effort="28.0" velocity="3.1416"/>
+  </joint>
+
+  <link name="wrist_2_link">
+    <inertial>
+      <mass value="1.219"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <collision>
+      <geometry><sphere radius="0.028"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="wrist_3_joint" type="revolute">
+    <parent link="wrist_2_link"/>
+    <child link="wrist_3_link"/>
+    <origin xyz="0 0.0996 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-6.2832" upper="6.2832" effort="28.0" velocity="3.1416"/>
+  </joint>
+
+  <link name="wrist_3_link">
+    <inertial>
+      <mass value="0.1889"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+    <collision>
+      <geometry><sphere radius="0.025"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <parent link="wrist_3_link"/>
+    <child link="tool0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool0">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+Urdf = "test.urdf"
+dof = 2
+
+[plp.arm]
+chain = ["baslow\rk"# aslowerk", "ee_na]me"

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <cha>n base_collisip    <chain base_ reason="Adjacent"/>
+</robot>

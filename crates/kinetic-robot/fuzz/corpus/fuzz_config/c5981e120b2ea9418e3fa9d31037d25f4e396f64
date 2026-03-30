@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dKf = 2
+
+[planning_gruop.arm]
+c_ain = me = ek"]

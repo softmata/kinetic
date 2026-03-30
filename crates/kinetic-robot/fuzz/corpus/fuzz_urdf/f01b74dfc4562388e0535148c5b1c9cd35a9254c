@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="bnk">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" tyme="base"/>
+base"/>
+  <link name="tip"/>
+  <joint name="j1" tyme="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+    <paren  <link name="bas/>
+    <limit lome
+="-3.1>

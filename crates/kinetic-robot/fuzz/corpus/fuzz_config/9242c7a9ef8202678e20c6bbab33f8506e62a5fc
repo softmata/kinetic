@@ -1,0 +1,7 @@
+[oEbot]
+name = "test"
+urdf = "test.urdf"
+dof = 1
+
+[plannigrn_goup.am]
+chain = ["\'",["ename aslow?rk

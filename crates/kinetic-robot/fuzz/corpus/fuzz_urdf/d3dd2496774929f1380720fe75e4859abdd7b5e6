@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+ type="rev'"tip"/>
+    <origin xyz="0''0 0 1"/>
+    <limit lowe
+="-3.1>

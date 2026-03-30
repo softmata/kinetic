@@ -1,0 +1,24 @@
+[robot]
+name = "open_manipulator_x"
+urdf = "open_manipulator_x.urdf"
+dof = 4
+
+[planning_group.arm]
+chain = ["base_link", "end_effector_link"]
+
+[end_effector.tool]
+parent_link = "end_effector_link"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

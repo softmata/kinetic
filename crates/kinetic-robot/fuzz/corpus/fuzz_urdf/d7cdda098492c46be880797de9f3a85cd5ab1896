@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="baqe"/>
+  ="baqe"/>
+  <link name="tip"/>
+  Ajoint  <origin xyz="0 0 0.1"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="lower" upper="3.14" velocity="2.0" effo="0 0 1"/>
+    <limit lower="lower" upper="3.14" velocity="2.0" effort="101"/>
+  </joint>
+</robot>

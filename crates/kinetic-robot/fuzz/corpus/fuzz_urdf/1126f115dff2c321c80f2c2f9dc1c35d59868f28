@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link tymename="base"/>
+  <link nale="tip"/>
+  <joint nam.1pdr="3.14" velocity="2.0" effor="1t00"/>
+  </joint>
+</robot>

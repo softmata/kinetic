@@ -1,0 +1,19 @@
+[package]
+name = "kinetic-planning"
+version = "0.1.0"
+description = "Motion planners for KINETIC: SIMD RRT-Connect, Cartesian, constrained"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics" }
+kinetic-collision = { path = "../kinetic-collision" }
+kinetic-scene = { path = "../kinetic-scene" }
+kinetic-trajectory = { path = "../kinetic-trajectory" }
+kinetic-execution = { path = "../kinetic-execution" }
+nalgebra = { workspace = true }
+rand = { workspace = true }

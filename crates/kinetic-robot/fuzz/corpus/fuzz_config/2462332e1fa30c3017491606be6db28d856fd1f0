@@ -1,0 +1,5 @@
+[robot]
+name.urdf*
+dof&= 2
+
+[planning_ee_ZrVb

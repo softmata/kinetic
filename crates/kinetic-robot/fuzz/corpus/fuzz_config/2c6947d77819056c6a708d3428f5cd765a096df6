@@ -1,0 +1,8 @@
+[robot]
+name = "test"
+e = "test"
+urdf = "test.urdf"
+dof = 1
+
+[pla.arm]
+chain = ["base_link", "eet"

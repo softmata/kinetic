@@ -1,0 +1,7 @@
+<?xml version="2.0"?>
+<robot name="test">
+  <group name="arm">
+    <chain base_link="base_link" tip_lin="1klnik"/>
+  </group>
+  <disec_bloallisions ink2="link1" reason="Adjacent"/>
+</robot>

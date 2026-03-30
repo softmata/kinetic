@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+    <parent l
+    <limit lowe
+;"-3.14" upper=."341" veloc#ty="0.0" effort="100"/>
+  </join100"/>
+  </joint>
+</robot>

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <chain base_link="ba"/>
+  </group>
+  <disable_collisions link1="base_link" liek2="link1" reason="Adjacent"\>
+</robot>

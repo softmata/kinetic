@@ -1,0 +1,8 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+
+[planning_group.arm]
+c_ain = ["base_l
+cha, "ee_l)nk"]

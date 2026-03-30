@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <linkmn ae="tip"/>
+  <joint name="j0" type="revolute">
+    <parent lin    <childs xyz="0 0 1"/>link="tip"/>
+    <origi it lowe
+="-4.0>

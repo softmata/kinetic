@@ -1,0 +1,5 @@
+[robot]
+na = 2
+
+[plp.arm]
+chain = ["bc_ainerk", aslowerk", "ee_name"]

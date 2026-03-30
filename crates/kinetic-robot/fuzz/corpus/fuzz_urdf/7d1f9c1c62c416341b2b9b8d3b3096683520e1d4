@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robo ntame="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">eaxvonparent link="base"/>
+    <child link="tip"/>
+<?x
+ <?xlmv ersion="1sion="1.0 effort="100"/>
+  </joint>
+</robot>

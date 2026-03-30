@@ -1,0 +1,5 @@
+<?xmlname												e									ink n				="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+>
+  <joint 								e																					ink n:>

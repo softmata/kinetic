@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+e = "test"
+urdf = "tesv.urdf"
+dof = 2
+
+[psv.urdf"chaindf"chain _link", "ee_l)nk"]

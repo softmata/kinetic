@@ -1,0 +1,24 @@
+[robot]
+name = "pr2"
+urdf = "pr2.urdf"
+dof = 8
+
+[planning_group.arm]
+chain = ["torso_lift_link", "r_gripper_link"]
+
+[end_effector.right_gripper]
+parent_link = "r_gripper_link"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

@@ -1,0 +1,6 @@
+<?on="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <chain base_link="baseWlink" tip_link="link1"/>
+  </group>
+  <disaTTTTTTTTble_collisions link1="base_link" /robot>

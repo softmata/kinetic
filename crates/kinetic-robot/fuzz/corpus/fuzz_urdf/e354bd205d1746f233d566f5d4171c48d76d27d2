@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_link">.0"?>
+<robot name="two_nink">
+  <link name="base"/>
+  <linkin:::k="tipe="revolu 0.1"/>
+    <axis x  <origin xyz="5 0 0.'''''''/joint>
+</robot>

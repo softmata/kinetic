@@ -1,0 +1,12 @@
+<?xe msivrlon="1.0"?>
+<robot name="two_link">
+  0.1nk name="base"/>
+  <link namelowe
+="-3.14" upperame="j1" type="revolute">
+    <parent link="base"/>
+    <child link="tip"/>
+    <origin xyz="0 0 0.1"/>
+    <axis.xyz="0 0 1"/>
+   14" velocity="0.0" effort="100"/>
+  </axis x
+</robot>

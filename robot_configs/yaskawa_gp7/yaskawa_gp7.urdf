@@ -1,0 +1,116 @@
+<?xml version="1.0" ?>
+<!-- Yaskawa GP7 URDF - industrial robot, no meshes -->
+<!-- Joint axes: Z, Y, Y, Y, Z, Y (standard 6-DOF convention) -->
+<!-- DH: d=[0.330, 0, 0, 0.340, 0, 0.080], a=[0.040, 0.345, 0.040, 0, 0, 0] -->
+<!-- Link names follow Yaskawa convention: S, L, U, R, B, T -->
+<robot name="yaskawa_gp7">
+  <link name="base_link">
+    <inertial>
+      <mass value="8.0"/>
+      <inertia ixx="0.05" ixy="0.0" ixz="0.0" iyy="0.05" iyz="0.0" izz="0.05"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_s" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_s"/>
+    <origin xyz="0 0 0.330" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.9671" upper="2.9671" effort="130.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link_s">
+    <inertial>
+      <mass value="6.5"/>
+      <inertia ixx="0.04" ixy="0.0" ixz="0.0" iyy="0.04" iyz="0.0" izz="0.03"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_l" type="revolute">
+    <parent link="link_s"/>
+    <child link="link_l"/>
+    <origin xyz="0.040 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.1345" upper="2.5307" effort="130.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link_l">
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.03" ixy="0.0" ixz="0.0" iyy="0.03" iyz="0.0" izz="0.02"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_u" type="revolute">
+    <parent link="link_l"/>
+    <child link="link_u"/>
+    <origin xyz="0.345 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.0194" upper="4.4506" effort="60.0" velocity="6.98"/>
+  </joint>
+
+  <link name="link_u">
+    <inertial>
+      <mass value="2.5"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_r" type="revolute">
+    <parent link="link_u"/>
+    <child link="link_r"/>
+    <origin xyz="0.040 0 0.340" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.3161" upper="3.3161" effort="30.0" velocity="7.85"/>
+  </joint>
+
+  <link name="link_r">
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.003" iyz="0.0" izz="0.002"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_b" type="revolute">
+    <parent link="link_r"/>
+    <child link="link_b"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.3562" upper="2.3562" effort="30.0" velocity="7.85"/>
+  </joint>
+
+  <link name="link_b">
+    <inertial>
+      <mass value="0.8"/>
+      <inertia ixx="0.002" ixy="0.0" ixz="0.0" iyy="0.002" iyz="0.0" izz="0.002"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_t" type="revolute">
+    <parent link="link_b"/>
+    <child link="link_t"/>
+    <origin xyz="0 0.080 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-6.2832" upper="6.2832" effort="15.0" velocity="10.47"/>
+  </joint>
+
+  <link name="link_t">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0002" ixy="0.0" ixz="0.0" iyy="0.0002" iyz="0.0" izz="0.0002"/>
+    </inertial>
+  </link>
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <parent link="link_t"/>
+    <child link="tool0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool0">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

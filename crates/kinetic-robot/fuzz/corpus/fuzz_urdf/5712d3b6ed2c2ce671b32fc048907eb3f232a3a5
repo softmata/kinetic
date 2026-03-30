@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<rofot name="two_link">
+  0.<?mlx version="1.0"?>
+<robot name="two_li1nk na"/>
+    <child link="tip"/>
+    <origin xyz="0 0 0.1"/nk>
+ "

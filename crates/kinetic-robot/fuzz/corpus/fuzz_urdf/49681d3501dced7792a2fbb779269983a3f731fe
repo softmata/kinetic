@@ -1,0 +1,9 @@
+<?xm [v<<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+    <parent link="base"/>
+    <childkn il="tip"/>
+    <o,iane="two_link">
+  <link n

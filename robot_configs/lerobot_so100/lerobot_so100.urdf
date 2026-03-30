@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+<!-- LeRobot SO-100 URDF - 6-DOF variant of SO-ARM100 (extra wrist joint), no meshes -->
+<!-- Joint axes: Z, Y, Y, Y, Y, Z -->
+<!-- DH: d=[0.060, 0, 0, 0, 0, 0.040], a=[0, 0.105, 0.098, 0.035, 0.035, 0] -->
+<robot name="lerobot_so100">
+  <link name="base_link">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0.060" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.6180" upper="2.6180" effort="2.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link1">
+    <inertial>
+      <mass value="0.15"/>
+      <inertia ixx="0.0003" ixy="0.0" ixz="0.0" iyy="0.0003" iyz="0.0" izz="0.0002"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_2" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.6180" upper="2.6180" effort="2.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link2">
+    <inertial>
+      <mass value="0.12"/>
+      <inertia ixx="0.0002" ixy="0.0" ixz="0.0" iyy="0.0002" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_3" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0.105 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.6180" upper="2.6180" effort="2.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link3">
+    <inertial>
+      <mass value="0.10"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.00008"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_4" type="revolute">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0.098 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.6180" upper="2.6180" effort="2.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link4">
+    <inertial>
+      <mass value="0.08"/>
+      <inertia ixx="0.00008" ixy="0.0" ixz="0.0" iyy="0.00008" iyz="0.0" izz="0.00005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_5" type="revolute">
+    <parent link="link4"/>
+    <child link="link5"/>
+    <origin xyz="0.035 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-2.6180" upper="2.6180" effort="1.5" velocity="5.76"/>
+  </joint>
+
+  <link name="link5">
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.00005" iyz="0.0" izz="0.00003"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_6" type="revolute">
+    <parent link="link5"/>
+    <child link="link6"/>
+    <origin xyz="0.035 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.6180" upper="2.6180" effort="1.0" velocity="5.76"/>
+  </joint>
+
+  <link name="link6">
+    <inertial>
+      <mass value="0.03"/>
+      <inertia ixx="0.00003" ixy="0.0" ixz="0.0" iyy="0.00003" iyz="0.0" izz="0.00003"/>
+    </inertial>
+  </link>
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <parent link="link6"/>
+    <child link="end_effector"/>
+    <origin xyz="0 0 0.040" rpy="0 0 0"/>
+  </joint>
+
+  <link name="end_effector">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

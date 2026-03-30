@@ -1,0 +1,9 @@
+<?mlx version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tioooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooop"/>
+  <joint name="j1" type="revolute">
+  0.1"/>
+    ="0 0 1xmlname									"100y"/>
+  </joint>
+</robot>

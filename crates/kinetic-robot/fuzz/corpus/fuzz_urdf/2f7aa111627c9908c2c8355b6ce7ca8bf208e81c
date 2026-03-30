@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link namz="1 0 5xmlname																							="mi"3.14" velocity="2 <limit lowe
+="-3.14" .0" effort="100"/>
+  </joint>
+</robot>

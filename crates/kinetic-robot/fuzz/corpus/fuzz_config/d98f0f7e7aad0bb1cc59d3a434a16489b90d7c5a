@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+[robot]
+name = "tet"
+urdf [robourdf = "test.urdf"
+d= o2f 
+

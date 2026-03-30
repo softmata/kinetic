@@ -1,0 +1,17 @@
+[package]
+name = "kinetic-dynamics"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Dynamics bridge for kinetic — torque-feasibility, gravity compensation, and mass matrix via featherstone"
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics" }
+kinetic-trajectory = { path = "../kinetic-trajectory" }
+featherstone = "0.1"
+nalgebra = { workspace = true }
+thiserror = { workspace = true }

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="twn_link">
+  <link nae="tip"/>
+  <joint name="j1" type="revolute">
+  0.1"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.28" uppdr="3.00"/>
+  </joint>
+< effo2rt="100"/>
+  </joint>
+</robot>

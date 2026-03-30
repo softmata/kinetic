@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<robot naee="two_linkr" upper="3.14" vffo="0 0 1"/>
+    <limit lower= l/robot>

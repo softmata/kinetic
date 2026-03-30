@@ -1,0 +1,100 @@
+<?xml version="1.0" ?>
+<!-- Hello Robot Stretch RE2 URDF - telescoping arm with 2 prismatic + 2 revolute joints, no meshes -->
+<!-- Joints: lift (prismatic Z), arm (prismatic X), wrist_yaw (Z), wrist_pitch (Y) -->
+<!-- Custom kinematics: prismatic lift + telescoping arm + 2-DOF wrist -->
+<robot name="stretch_re2">
+  <link name="base_link">
+    <inertial>
+      <mass value="22.0"/>
+      <inertia ixx="0.5" ixy="0.0" ixz="0.0" iyy="0.5" iyz="0.0" izz="0.3"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_lift" type="prismatic">
+    <parent link="base_link"/>
+    <child link="link_lift"/>
+    <origin xyz="-0.037 0 0.027" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="0.0" upper="1.1" effort="70.0" velocity="0.15"/>
+  </joint>
+
+  <link name="link_lift">
+    <inertial>
+      <mass value="2.5"/>
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.005"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_arm" type="prismatic">
+    <parent link="link_lift"/>
+    <child link="link_arm"/>
+    <origin xyz="0 0 0.9" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="0.0" upper="0.52" effort="25.0" velocity="0.15"/>
+  </joint>
+
+  <link name="link_arm">
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.003" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_wrist_yaw" type="revolute">
+    <parent link="link_arm"/>
+    <child link="link_wrist_yaw"/>
+    <origin xyz="0.13 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.3963" upper="4.4506" effort="5.0" velocity="2.5"/>
+  </joint>
+
+  <link name="link_wrist_yaw">
+    <inertial>
+      <mass value="0.3"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0003"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_wrist_pitch" type="revolute">
+    <parent link="link_wrist_yaw"/>
+    <child link="link_wrist_pitch"/>
+    <origin xyz="0.046 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.5708" upper="0.5585" effort="5.0" velocity="2.5"/>
+  </joint>
+
+  <link name="link_wrist_pitch">
+    <inertial>
+      <mass value="0.15"/>
+      <inertia ixx="0.0002" ixy="0.0" ixz="0.0" iyy="0.0002" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="joint_wrist_roll" type="revolute">
+    <parent link="link_wrist_pitch"/>
+    <child link="link_wrist_roll"/>
+    <origin xyz="0.039 0 0" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.1416" upper="3.1416" effort="3.0" velocity="3.0"/>
+  </joint>
+
+  <link name="link_wrist_roll">
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="ee_fixed_joint" type="fixed">
+    <parent link="link_wrist_roll"/>
+    <child link="link_grasp_center"/>
+    <origin xyz="0.026 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="link_grasp_center">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+</robot>

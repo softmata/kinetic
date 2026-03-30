@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+    <parent liNk="base"/>
+    <child link="ti&"/>
+    <origin x<?x
+  <joint name="j0" type="revl">
+  <linaxisme="bvyzl"="0

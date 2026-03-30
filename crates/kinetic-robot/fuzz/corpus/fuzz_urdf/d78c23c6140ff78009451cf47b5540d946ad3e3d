@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot >
+  <link name="tip"/>
+  <joint na-e="j1" type="revolute">
+    <parent link="b <limit lowe
+="-3.1>

@@ -1,0 +1,34 @@
+[package]
+name = "horus-kinetic"
+version = "0.1.0"
+description = "HORUS bridge for KINETIC: PlannerNode, ServoNode, SceneNode"
+edition = "2021"
+rust-version = "1.75"
+license = "Apache-2.0"
+repository = "https://gitlab.com/softmata/kinetic"
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics" }
+kinetic-planning = { path = "../kinetic-planning" }
+kinetic-reactive = { path = "../kinetic-reactive" }
+kinetic-scene = { path = "../kinetic-scene" }
+kinetic-trajectory = { path = "../kinetic-trajectory" }
+kinetic-task = { path = "../kinetic-task" }
+nalgebra = { version = "0.33", features = ["serde-serialize"] }
+serde = { version = "1", features = ["derive"] }
+softmata-core = { version = "0.1.0", path = "../../../softmata-core" }
+thiserror = "2"
+
+# HORUS framework (optional, for actual IPC integration)
+horus = { path = "../../../horus/horus", optional = true }
+horus_core = { path = "../../../horus/horus_core", optional = true }
+
+[dev-dependencies]
+serde_json = "1"
+
+[features]
+default = []
+# Enable real HORUS IPC integration (requires HORUS framework)
+horus-ipc = ["dep:horus", "dep:horus_core"]

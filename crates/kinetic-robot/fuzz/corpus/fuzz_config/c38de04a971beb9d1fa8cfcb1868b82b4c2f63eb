@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+Urdf = "test.urdf"
+dof = 2
+
+[planning_groupplanning_group.oup.arm]
+cherk",_name"]

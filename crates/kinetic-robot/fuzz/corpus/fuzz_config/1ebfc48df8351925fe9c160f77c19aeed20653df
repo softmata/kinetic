@@ -1,0 +1,7 @@
+[robot]
+name = "tt"
+urdl = "test.urdf"
+dof = 1
+
+[planning_group."arm]
+chain = ["bas"test.urdfee_l)nk"]

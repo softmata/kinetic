@@ -1,0 +1,5 @@
+[robot]
+namerdf = "test.urdf"
+dof1 = 2
+
+[pla]

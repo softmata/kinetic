@@ -1,0 +1,8 @@
+[robot]
+name = "test"
+Urdf = "test.urdf"
+dof = 2
+
+[plp.arm]
+chaUrdf = "test.urdf"
+dof werk", "ee_name"]

@@ -1,0 +1,36 @@
+# Rust Build Artifacts
+target/
+**/target/
+**/*.rs.bk
+*.pdb
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+
+# Environment Variables
+.env
+.env*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cache
+.cache/
+*.cache
+
+# Coverage reports
+coverage/
+
+# Claude Code
+.claude/
+CLAUDE.md

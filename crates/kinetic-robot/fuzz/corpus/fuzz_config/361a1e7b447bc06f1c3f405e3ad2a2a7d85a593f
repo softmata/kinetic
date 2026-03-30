@@ -1,0 +1,8 @@
+[robo2]
+name = "test"
+Urdf = "test.urdf#"
+dof = 2
+
+
+[planning_group.k
+dofname"]

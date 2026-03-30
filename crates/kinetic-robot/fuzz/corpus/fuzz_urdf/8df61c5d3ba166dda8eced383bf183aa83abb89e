@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link namce="base"/>
+  <link Name="tip"/>
+  <jsjoin

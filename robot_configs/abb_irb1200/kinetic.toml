@@ -1,0 +1,23 @@
+[robot]
+name = "abb_irb1200"
+urdf = "abb_irb1200.urdf"
+dof = 6
+
+[planning_group.arm]
+chain = ["base_link", "tool0"]
+
+[end_effector.tool]
+parent_link = "tool0"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "opw"
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

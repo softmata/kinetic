@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_dink">
+  <li:nk axis="base"/>
+  ">
+    <parent link="e"/>
+    <child link="tip"/>
+    <oriame=t>

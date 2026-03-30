@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link naname="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="jffort="100"/>
+<?xml version="1.0"  ?><

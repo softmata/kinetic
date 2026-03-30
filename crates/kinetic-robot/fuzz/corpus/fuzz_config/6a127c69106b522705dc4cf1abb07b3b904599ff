@@ -1,0 +1,3 @@
+[robot]
+name = "test"
+ain = ["base_link", "ee_l)nk"]

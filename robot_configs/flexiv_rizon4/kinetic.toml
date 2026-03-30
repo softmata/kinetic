@@ -1,0 +1,24 @@
+[robot]
+name = "flexiv_rizon4"
+urdf = "flexiv_rizon4.urdf"
+dof = 7
+
+[planning_group.arm]
+chain = ["base_link", "flange"]
+
+[end_effector.tool]
+parent_link = "flange"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.0, -0.7854, 0.0, -1.5708, 0.0, 1.5708, 0.7854]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

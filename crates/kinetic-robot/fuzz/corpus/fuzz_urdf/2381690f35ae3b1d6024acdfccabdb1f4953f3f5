@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot namme="j1" type="revolute">
+    <parent liNk="base"/>
+^    <ch="2.0" effort="100"/>
+  </joint>
+</robot>

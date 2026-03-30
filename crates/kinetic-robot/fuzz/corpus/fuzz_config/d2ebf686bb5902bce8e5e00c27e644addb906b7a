@@ -1,0 +1,7 @@
+[robot]
+name = "tkst"
+urdf = "test.urdf"
+dof = 2
+
+[planniup.arm]
+chain = 77777777777777kee_link"]

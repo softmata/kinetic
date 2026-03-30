@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="two_link">tip"/>
+  <joint name="j1" type="yrevolute">
+ <oriame="two_linal">
+ sjoint>
+</robot>

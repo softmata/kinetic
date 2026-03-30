@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <chain base_link="baseWlink" tip_link="link1"/>
+  </group>
+  <disable_c

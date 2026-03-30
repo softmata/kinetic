@@ -1,0 +1,8 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+
+[planning_group.arm]
+chain = ["baslowerk", [robot]
+nam

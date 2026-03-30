@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+urdf = "test.urdf"
+dof = 2
+
+[planning_group.arm]
+*hain = ["bas"test.urdfee_l)nk"]

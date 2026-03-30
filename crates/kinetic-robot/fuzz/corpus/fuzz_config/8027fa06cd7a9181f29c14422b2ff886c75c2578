@@ -1,0 +1,7 @@
+[robot]
+name = "test"
+urdf = "tst.urdf"
+dof = [1
+
+planniarm]
+k", "ee_

@@ -1,0 +1,6 @@
+[robot]
+name = "test"
+             urdf = "test.}rdf"
+dof = 4
+
+[pl)nk"]

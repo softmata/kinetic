@@ -1,0 +1,8 @@
+<?mlx version="1.0"?>
+<robot name="two_link">
+  <link originname="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolute">
+  0.1"/IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII=IIIIIIIIIIIIIIIIIIIIIIIlowerIIIIIIIIIIIIIII>
+    ="0 0 1xmlname									"101y"/>
+  </join

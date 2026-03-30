@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Glossary - Kinetic — Motion Planning for Robotics</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 54 robots, GPU optimization.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-2459343d.css">
+        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "navy";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-c62e6abf.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-a6d67ab9.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Kinetic — Motion Planning for Robotics</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://gitlab.com/softmata/kinetic" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://gitlab.com/softmata/kinetic/-/edit/main/docs-site/src/concepts/glossary.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
+<p>Alphabetical definitions of key terms used throughout kinetic. Each entry gives a concise definition followed by a short explanation. Cross-references point to the concept page where the term is discussed in depth.</p>
+<hr>
+<p><strong>ACM (Allowed Collision Matrix)</strong> — A symmetric boolean matrix specifying which link pairs can safely be ignored during collision checking. Adjacent links in the kinematic tree always collide geometrically, so the ACM lets planners skip those known-benign pairs. Built from SRDF <code>&lt;disable_collisions&gt;</code> entries. See <a href="./collision-detection.html">Collision Detection</a>.</p>
+<p><strong>C-space (Configuration Space)</strong> — The space of all possible joint-value vectors for a robot. Each point in C-space is a vector of DOF joint values that fully determines the robot’s posture. A 6-DOF arm lives in a 6-dimensional C-space. Motion planning searches for collision-free paths through C-space. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>CCD (Continuous Collision Detection)</strong> — Collision checking that considers the swept volume between two configurations, not just the start and end. Prevents the robot from passing through thin obstacles between waypoints. See <a href="./collision-detection.html">Collision Detection</a>.</p>
+<p><strong>Configuration</strong> — A specific set of joint values that fully determines every link’s pose. In kinetic, represented as <code>&amp;[f64]</code> of length <code>robot.dof</code> or as a <code>JointValues</code> struct. The zero configuration has all joints at 0; the mid-configuration centers each joint between its limits. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Constraint</strong> — A requirement imposed on a planned motion. Position constraints restrict the end-effector to a region of space. Orientation constraints restrict which way it faces. Joint constraints restrict individual joint ranges. In kinetic, the <code>Constraint</code> type is used by planners. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>DOF (Degrees of Freedom)</strong> — The number of independent joint values that define a configuration. A typical industrial arm has 6 DOF (exactly enough for arbitrary 6D pose). A 7-DOF arm (e.g., Franka Panda) has one redundant DOF, giving a null space. Stored as <code>robot.dof</code>. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>DLS (Damped Least Squares)</strong> — An iterative IK solver that uses the pseudo-inverse of the Jacobian with an added damping term (Levenberg-Marquardt style). The damping prevents instability near singularities at the cost of slightly slower convergence. In kinetic: <code>IKSolver::DLS { damping: 0.05 }</code>. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>EE (End-Effector)</strong> — The functional tip of a kinematic chain, typically where a tool or gripper is attached. Defined by a parent link and an optional grasp-frame offset. In kinetic: <code>Robot::end_effectors</code> and the <code>EndEffector</code> struct. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>FABRIK (Forward And Backward Reaching Inverse Kinematics)</strong> — An iterative IK solver that alternates between reaching forward from the base and backward from the target. Works position-first, then refines orientation. Fast and intuitive but less precise on orientation than DLS. In kinetic: <code>IKSolver::FABRIK</code>. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>FK (Forward Kinematics)</strong> — Computing the end-effector pose from joint values by chaining transforms through the kinematic tree. The fundamental operation in robotics: given angles, where is the tool? In kinetic: <code>forward_kinematics()</code>, <code>robot.fk()</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>FrameTree</strong> — A named-frame graph that stores SE(3) transforms between coordinate frames. Equivalent to ROS2 TF2 but standalone. Supports chain resolution (A to C via A to B to C) and automatic inversion. In kinetic: <code>FrameTree::new()</code>, <code>set_transform()</code>, <code>lookup_transform()</code>. See <a href="./coordinate-frames.html">Coordinate Frames</a>.</p>
+<p><strong>Goal</strong> — The target specification for a motion plan. Can be a Cartesian pose, a joint configuration, a named pose, or a set of constraints. In kinetic, the <code>Goal</code> enum specifies what the planner is trying to reach. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>IK (Inverse Kinematics)</strong> — Finding joint values that place the end-effector at a desired pose. The inverse of FK. Often has multiple solutions, no solution, or infinite solutions. In kinetic: <code>solve_ik()</code>, <code>robot.ik()</code>. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>Isometry3</strong> — The nalgebra type <code>Isometry3&lt;f64&gt;</code> representing a rigid-body transform: rotation (as <code>UnitQuaternion</code>) plus translation. Preserves distances and angles. The mathematical representation of SE(3) used throughout kinetic. See <a href="./coordinate-frames.html">Coordinate Frames</a>.</p>
+<p><strong>Jacobian</strong> — A 6-by-DOF matrix mapping joint velocities to end-effector spatial velocity. Rows 0-2 are linear velocity (m/s), rows 3-5 are angular velocity (rad/s). Used for IK, manipulability analysis, and velocity control. In kinetic: <code>jacobian()</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Joint (revolute)</strong> — A joint that rotates around an axis within position limits. The most common joint type in robot arms. Each revolute joint contributes one rotational DOF. In kinetic: <code>JointType::Revolute</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Joint (prismatic)</strong> — A joint that translates along an axis within position limits. Common in linear stages and Cartesian robots. Each prismatic joint contributes one translational DOF. In kinetic: <code>JointType::Prismatic</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Joint (continuous)</strong> — A revolute joint with no position limits. It can spin indefinitely (e.g., a wheel). Treated identically to revolute for FK/IK but limit checking is skipped. In kinetic: <code>JointType::Continuous</code>. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>Joint (fixed)</strong> — A non-actuated joint that rigidly attaches two links. Contributes zero DOF. Used for sensor mounts, tool flanges, and structural connections. In kinetic: <code>JointType::Fixed</code>. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>Joint Limits</strong> — Position, velocity, effort, and acceleration bounds on a joint. Position limits define the range of legal values (radians or meters). Stored in <code>JointLimits</code> and enforced by planners and IK solvers. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>KinematicChain</strong> — An ordered subset of joints connecting a base link to a tip link. Extracted from the robot’s kinematic tree for FK/IK computation. In kinetic: <code>KinematicChain::extract(&amp;robot, "base_link", "ee_link")</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Manipulability</strong> — A scalar measuring how dexterous the robot is at a given configuration. Computed as <code>sqrt(det(J * J^T))</code> (Yoshikawa’s measure). Zero at singularities, high when the robot can move freely in all directions. In kinetic: <code>manipulability()</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Null Space</strong> — The set of joint velocities that produce zero end-effector velocity. Exists only for redundant robots (DOF &gt; 6). Null-space motion lets the robot reconfigure internally without moving the tool. Used for secondary objectives like joint centering. In kinetic: <code>NullSpace</code> enum. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>OPW (Ortho-Parallel-Wrist)</strong> — An analytical IK solver for 6-DOF robots with a spherical wrist (last three axes intersect). Returns up to 8 closed-form solutions in under 50 microseconds. Covers UR, ABB, KUKA, Fanuc, and similar industrial arms. In kinetic: <code>IKSolver::OPW</code>. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>Planning Group</strong> — A named subset of joints used for planning. Separates the arm from the gripper, or the left arm from the right. Defined in a TOML config or SRDF file. In kinetic: <code>PlanningGroup</code> with <code>base_link</code>, <code>tip_link</code>, and <code>joint_indices</code>. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>Pose</strong> — A position plus an orientation in 3D space; a point in SE(3). In kinetic, the <code>Pose</code> struct wraps <code>Isometry3&lt;f64&gt;</code> and provides constructors like <code>Pose::from_xyz_rpy()</code> and <code>Pose::from_xyz_quat()</code>. See <a href="./coordinate-frames.html">Coordinate Frames</a>.</p>
+<p><strong>Quaternion</strong> — A 4-component representation of 3D rotation (qx, qy, qz, qw). Unit quaternions avoid gimbal lock, interpolate smoothly, and compose efficiently. In kinetic, <code>UnitQuaternion&lt;f64&gt;</code> from nalgebra is the primary rotation representation. See <a href="./coordinate-frames.html">Coordinate Frames</a>.</p>
+<p><strong>RMP (Riemannian Motion Policy)</strong> — A reactive control framework that combines multiple motion policies on a Riemannian manifold. Each policy pulls the robot toward a goal, away from obstacles, or along a preferred direction. See <a href="./reactive-control.html">Reactive Control</a>.</p>
+<p><strong>RRT (Rapidly-exploring Random Tree)</strong> — A sampling-based motion planner that grows a tree from the start configuration toward random C-space samples. Probabilistically complete: guaranteed to find a path if one exists, given enough time. In kinetic: multiple RRT variants. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>SE(3)</strong> — The Special Euclidean group in 3D: the set of all rigid-body transforms (rotation + translation). Every pose in the physical world is a point in SE(3). Mathematically, SE(3) = SO(3) x R^3. In kinetic, represented by <code>Isometry3&lt;f64&gt;</code> and the <code>Pose</code> wrapper. See <a href="./coordinate-frames.html">Coordinate Frames</a>.</p>
+<p><strong>Self-Collision</strong> — A collision between two links of the same robot. Must be checked during planning to prevent the arm from hitting itself. The ACM (from SRDF) disables expected self-collision pairs. See <a href="./collision-detection.html">Collision Detection</a>.</p>
+<p><strong>Singularity</strong> — A configuration where the Jacobian loses rank, meaning the robot cannot move in some direction. At a singularity, manipulability is zero and IK becomes ill-conditioned. Common examples: fully extended arm, wrist axes aligned. See <a href="./forward-kinematics.html">Forward Kinematics</a>, <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>SRDF (Semantic Robot Description Format)</strong> — An XML companion to URDF that adds planning-level semantics: planning groups, disabled collision pairs, end-effectors, and named poses. Originated from MoveIt. In kinetic: <code>SrdfModel::from_file()</code>, <code>Robot::from_urdf_srdf()</code>. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>TOTP (Time-Optimal Trajectory Parameterization)</strong> — An algorithm that computes the fastest timing for a geometric path while respecting velocity and acceleration limits. Turns a path (sequence of waypoints) into a time-parameterized trajectory. See <a href="./trajectory-generation.html">Trajectory Generation</a>.</p>
+<p><strong>Trajectory</strong> — A time-parameterized sequence of waypoints: each waypoint has joint values plus a timestamp. Distinguished from a path (no timing). In kinetic, <code>Trajectory</code> stores timed waypoints in struct-of-arrays layout. See <a href="./trajectory-generation.html">Trajectory Generation</a>.</p>
+<p><strong>URDF (Unified Robot Description Format)</strong> — An XML format describing a robot’s links, joints, geometry, and limits. The standard robot model format in ROS and the robotics industry. In kinetic: <code>Robot::from_urdf()</code>, <code>Robot::from_urdf_string()</code>. See <a href="./robots-and-urdf.html">Robots and URDF</a>.</p>
+<p><strong>Waypoint</strong> — A single configuration (joint values) along a planned path. A trajectory is built from waypoints plus timing information. In kinetic, <code>Waypoint</code> holds positions, and <code>TimedWaypoint</code> adds a timestamp. See <a href="./trajectory-generation.html">Trajectory Generation</a>.</p>
+<p><strong>Workspace</strong> — The set of all positions (and orientations) the end-effector can reach. The workspace is bounded by arm geometry and joint limits. Points outside the workspace have no IK solution. In kinetic: <code>ReachabilityMap</code> samples the workspace. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>Bio-IK</strong> — An evolutionary IK solver using a population-based strategy (CMA-ES inspired). Maintains a population of candidate joint configurations, selects the fittest, and mutates. Effective for highly redundant robots (7+ DOF) and multi-objective IK. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>CHOMP (Covariant Hamiltonian Optimization for Motion Planning)</strong> — A trajectory optimizer that minimizes a cost functional over the entire trajectory simultaneously, using covariant gradient descent. Smooths paths while avoiding obstacles. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>Condition Number</strong> — The ratio of the largest to smallest singular value of the Jacobian. Measures proximity to singularity. Below 50 is good; above 100 is marginal; above 1000 is near-singular. Reported in <code>IKSolution::condition_number</code>. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>JointValues</strong> — A named vector of joint positions. Wraps <code>Vec&lt;f64&gt;</code> with indexing, arithmetic, and interop with nalgebra. Length equals <code>robot.dof</code>. The primary type for passing joint configurations through the kinetic API. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>PRM (Probabilistic Road Map)</strong> — A sampling-based planner that pre-builds a graph of collision-free configurations connected by local paths. Multi-query: the graph is reusable across different start/goal pairs. Efficient when the robot repeatedly plans in the same environment. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>Seed Configuration</strong> — The starting joint values for an iterative IK solver. The solver converges toward the nearest solution to the seed. Choosing a good seed avoids unnecessary arm reconfiguration and helps escape local minima. In kinetic: <code>IKConfig::seed</code>. See <a href="./inverse-kinematics.html">Inverse Kinematics</a>.</p>
+<p><strong>STOMP (Stochastic Trajectory Optimization for Motion Planning)</strong> — A trajectory optimizer that explores the cost landscape by sampling noisy trajectories around a seed. Does not require gradient information, making it robust to non-smooth cost functions. See <a href="./motion-planning.html">Motion Planning</a>.</p>
+<p><strong>Twist</strong> — A 6-DOF velocity vector: three linear components (m/s) and three angular components (rad/s). Represents spatial velocity of a rigid body. In kinetic: the <code>Twist</code> struct. Related to the Jacobian: <code>twist = J * joint_velocities</code>. See <a href="./forward-kinematics.html">Forward Kinematics</a>.</p>
+<p><strong>Wrench</strong> — A 6-DOF force/torque vector: three force components (N) and three torque components (Nm). Represents forces and moments applied to a rigid body. In kinetic: the <code>Wrench</code> struct. Dual of Twist under the power pairing. See <a href="./glossary.html">Glossary</a>.</p>
+<h2 id="see-also"><a class="header" href="#see-also">See Also</a></h2>
+<ul>
+<li><a href="./robots-and-urdf.html">Robots and URDF</a> — how robots are loaded and configured</li>
+<li><a href="./coordinate-frames.html">Coordinate Frames</a> — SE(3), poses, and the FrameTree</li>
+<li><a href="./forward-kinematics.html">Forward Kinematics</a> — computing end-effector poses</li>
+<li><a href="./inverse-kinematics.html">Inverse Kinematics</a> — finding joint angles for a target pose</li>
+<li><a href="./motion-planning.html">Motion Planning</a> — collision-free path search</li>
+<li><a href="./trajectory-generation.html">Trajectory Generation</a> — timing and smoothing of paths</li>
+<li><a href="./collision-detection.html">Collision Detection</a> — self-collision and environment checking</li>
+<li><a href="./reactive-control.html">Reactive Control</a> — real-time motion policies</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../getting-started/next-steps.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../concepts/robots-and-urdf.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../getting-started/next-steps.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../concepts/robots-and-urdf.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-c2a407aa.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid-eefea253.min.js"></script>
+        <script src="../mermaid-init-ccf746f1.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

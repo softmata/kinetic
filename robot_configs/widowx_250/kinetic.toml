@@ -1,0 +1,23 @@
+[robot]
+name = "widowx_250"
+urdf = "widowx_250.urdf"
+dof = 6
+
+[planning_group.arm]
+chain = ["base_link", "ee_link"]
+
+[end_effector.tool]
+parent_link = "ee_link"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "opw"
+
+[named_poses]
+home = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

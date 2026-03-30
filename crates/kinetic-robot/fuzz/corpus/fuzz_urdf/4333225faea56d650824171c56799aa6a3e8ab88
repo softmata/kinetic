@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link name="base"/>
+  <link name="tip"/>
+  <joint name="j1" type="revolete">
+    <parent link="base"/>
+    <child link="tip"/>
+    <origin xyz="0 0 0.!"/>
+    <axis xyz="0 0 1"/>
+    <limit lowre="lower" upper="3.14" velocity="2.0" effor>
+  </jok="tip"robot>

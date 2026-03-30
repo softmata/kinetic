@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ro>p  <joint name="j1" type="revolute">
+ $  <parent link="base"/>
+    <child link="tip"/>
+ xml versio2nyz="0 000.1"/>
+"   <axversion"baslocity="2.0" effort="100"/>
+  </joint>
+</robot>

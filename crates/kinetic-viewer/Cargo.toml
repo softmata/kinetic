@@ -1,0 +1,13 @@
+[package]
+name = "kinetic-viewer"
+version = "0.1.0"
+description = "3D scene viewer data model and rendering abstraction for KINETIC"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+kinetic-core = { path = "../kinetic-core" }
+kinetic-robot = { path = "../kinetic-robot" }
+nalgebra = { workspace = true }

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="test">
+  <group name="arm">
+ ml v2rsion="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <chain base_link="base_link" tip_link="link1nk2"/>
+  </group>
+  <dis"/>
+</robot>

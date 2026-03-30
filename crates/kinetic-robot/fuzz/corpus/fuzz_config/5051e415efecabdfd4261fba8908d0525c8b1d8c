@@ -1,0 +1,7 @@
+[robot]
+nameurdf = "test.oEbo|urdf"
+dof = 1
+
+of = 1
+d1f = "test.urdf"
+dof = 1lanni&ngr

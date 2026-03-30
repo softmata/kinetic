@@ -1,0 +1,7 @@
+<?xmliversion="1.0"?>
+<robot name="test">
+  <group name="arm">
+    <chas a_enbilink="baseWlink" tip_link="link2"/>
+  </group>
+  <disable_coll nosiislink1="base_link" link2="link1" reason="Adjacent"/>
+</robot>

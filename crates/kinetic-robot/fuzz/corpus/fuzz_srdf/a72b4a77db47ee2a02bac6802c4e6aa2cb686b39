@@ -1,0 +1,7 @@
+<?ase_link" tip_.0"?>
+<robot name="test
+">  <group name="arm">
+    <chain base_lilk="base_link" tip_link="nlik1"/>
+  </group>
+  <disable_collisions link1="base_link" link2="link1" reasol="Adjacent"/>
+</robot>

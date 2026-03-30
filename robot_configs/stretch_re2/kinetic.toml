@@ -1,0 +1,25 @@
+[robot]
+name = "stretch_re2"
+urdf = "stretch_re2.urdf"
+dof = 5
+
+[planning_group.arm]
+chain = ["base_link", "link_grasp_center"]
+
+[end_effector.gripper]
+parent_link = "link_grasp_center"
+parent_group = "arm"
+tcp_xyz = [0.0, 0.0, 0.0]
+
+[ik]
+solver = "dls"
+damping = 0.05
+
+[named_poses]
+home = [0.3, 0.0, 0.0, 0.0, 0.0]
+zero = [0.0, 0.0, 0.0, 0.0, 0.0]
+stow = [0.2, 0.0, 3.14, 0.0, 0.0]
+
+[collision]
+self_collision_pairs = "auto"
+padding = 0.01

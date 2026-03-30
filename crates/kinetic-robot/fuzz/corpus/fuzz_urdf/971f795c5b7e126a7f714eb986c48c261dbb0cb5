@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+joint name="j1" type="revolute">
+    <parent link="base"/>
+    <child link="tip"/>
+ xml versio2nyz="0 000.1"/>
+    <axis  <limit lower="lo <xyz="0 0 "/>
+  </joint>
+</robot>

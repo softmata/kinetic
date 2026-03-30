@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!-- ViperX 300 URDF - Trossen Robotics 6-DOF arm, no meshes -->
+<!-- Joint axes: Z, Y, Y, Y, Z, Y -->
+<!-- DH: d=[0.0785, 0, 0, 0.070, 0.040, 0.072], a=[0, 0.259, 0.259, 0, 0, 0] -->
+<robot name="viperx_300">
+  <link name="base_link">
+    <inertial>
+      <mass value="0.7"/>
+      <inertia ixx="0.002" ixy="0.0" ixz="0.0" iyy="0.002" iyz="0.0" izz="0.002"/>
+    </inertial>
+  </link>
+
+  <joint name="waist" type="revolute">
+    <parent link="base_link"/>
+    <child link="shoulder_link"/>
+    <origin xyz="0 0 0.0785" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159" effort="15.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="shoulder_link">
+    <inertial>
+      <mass value="0.55"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="shoulder" type="revolute">
+    <parent link="shoulder_link"/>
+    <child link="upper_arm_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.8849" upper="1.9897" effort="15.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="upper_arm_link">
+    <inertial>
+      <mass value="0.45"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.0005"/>
+    </inertial>
+  </link>
+
+  <joint name="elbow" type="revolute">
+    <parent link="upper_arm_link"/>
+    <child link="forearm_link"/>
+    <origin xyz="0.259 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.8849" upper="1.6232" effort="10.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="forearm_link">
+    <inertial>
+      <mass value="0.3"/>
+      <inertia ixx="0.0005" ixy="0.0" ixz="0.0" iyy="0.0005" iyz="0.0" izz="0.0003"/>
+    </inertial>
+  </link>
+
+  <joint name="forearm_roll" type="revolute">
+    <parent link="forearm_link"/>
+    <child link="wrist_link"/>
+    <origin xyz="0.259 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.7453" upper="1.7453" effort="5.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="wrist_link">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0003" ixy="0.0" ixz="0.0" iyy="0.0003" iyz="0.0" izz="0.0002"/>
+    </inertial>
+  </link>
+
+  <joint name="wrist_angle" type="revolute">
+    <parent link="wrist_link"/>
+    <child link="gripper_link"/>
+    <origin xyz="0.070 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.5656" upper="2.5656" effort="5.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="gripper_link">
+    <inertial>
+      <mass value="0.15"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="wrist_rotate" type="revolute">
+    <parent link="gripper_link"/>
+    <child link="ee_link"/>
+    <origin xyz="0.040 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.14159" upper="3.14159" effort="3.0" velocity="6.2832"/>
+  </joint>
+
+  <link name="ee_link">
+    <inertial>
+      <mass value="0.08"/>
+      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.00005" iyz="0.0" izz="0.00005"/>
+    </inertial>
+  </link>
+
+  <joint name="ee_fixed" type="fixed">
+    <parent link="ee_link"/>
+    <child link="tool0"/>
+    <origin xyz="0.072 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool0"/>
+</robot>

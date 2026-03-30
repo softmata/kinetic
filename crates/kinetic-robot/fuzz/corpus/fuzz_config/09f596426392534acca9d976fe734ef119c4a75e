@@ -1,0 +1,5 @@
+rname = "test"
+             urdf = "test.}rdf"
+dof = 4
+
+[pltype]

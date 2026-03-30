@@ -1,0 +1,6 @@
+[robot]
+name = "test"
+urlowerdf = "test.urdf"
+dof = 4
+
+[planchain = []

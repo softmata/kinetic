@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<robot name="two;_link">
+  <link nameame="two;_l <link name="tip"/>  <koint name					"100"/>
+  </joint>
+</robot>

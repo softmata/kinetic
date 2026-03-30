@@ -1,0 +1,9 @@
+[robot]
+nama = "test"
+urdf = "test.urdf"
+dof = 0
+
+[tlanning_grouurdp.arm]
+c_l/nk"]
+[robot]
+nam

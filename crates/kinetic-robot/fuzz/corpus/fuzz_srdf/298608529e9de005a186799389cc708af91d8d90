@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot zname="test">
+  <grloup name="arm">
+    <chain base_link="baseWlink" tilink="link1"/>
+  </group>
+! <disable_coe_link><
+robot name="tes

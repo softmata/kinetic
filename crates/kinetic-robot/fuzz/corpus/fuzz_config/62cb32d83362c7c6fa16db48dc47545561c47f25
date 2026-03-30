@@ -1,0 +1,9 @@
+[robot]
+name = "test"
+e = "test"
+urdf = "test.urdf"
+dof = 2
+
+[pbot]
+name = "test"
+e = "tek", "ee_l)nk"]

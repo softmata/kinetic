@@ -1,0 +1,35 @@
+[package]
+name = "kinetic-robot-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.kinetic-robot]
+path = ".."
+
+[workspace]
+members = ["."]
+
+# Prevent this from interfering with workspaces
+[patch.crates-io]
+
+[[bin]]
+name = "fuzz_urdf"
+path = "fuzz_targets/fuzz_urdf.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_srdf"
+path = "fuzz_targets/fuzz_srdf.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_config"
+path = "fuzz_targets/fuzz_config.rs"
+doc = false

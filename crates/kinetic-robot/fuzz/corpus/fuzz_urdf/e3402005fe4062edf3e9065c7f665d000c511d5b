@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffflink">
+=>
+<robot name="two_link">
+  0.1nk na"/>
+    <child link="tip"/>
+    <origin xyz="0 0>

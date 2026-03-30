@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot name="two_link">
+  <link a  <link ase"/>
+    <child link="tiprigin xyz="5 0 0.1"/>
+   14" velocity="0.0" effort"0=0"/>
+  </axis x
+</robot>

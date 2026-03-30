@@ -1,0 +1,29 @@
+[book]
+title = "Kinetic — Motion Planning for Robotics"
+authors = ["Softmata"]
+description = "Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 54 robots, GPU optimization."
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[output.html]
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://gitlab.com/softmata/kinetic"
+edit-url-template = "https://gitlab.com/softmata/kinetic/-/edit/main/docs-site/{path}"
+site-url = "/kinetic/"
+no-section-label = false
+
+[output.html.search]
+enable = true
+limit-results = 20
+
+[output.html.fold]
+enable = true
+level = 1
