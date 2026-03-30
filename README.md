@@ -1,114 +1,128 @@
 # KINETIC
 
-Fast, Rust-native motion planning for robotics.
+Fast, Rust-native motion planning for robotics. Complete MoveIt2 replacement.
 
-KINETIC provides forward/inverse kinematics, SIMD-vectorized collision detection,
-and trajectory generation — all in pure Rust with f64 precision throughout.
+10 IK solvers, 14 planners, SIMD collision detection, 54 built-in robots, GPU trajectory optimization, full Python bindings.
 
-## Installation
-
-```toml
-[dependencies]
-kinetic = "0.1"
-```
+**[Documentation](https://softmata.gitlab.io/kinetic/)** | **[API Cheatsheet](https://softmata.gitlab.io/kinetic/reference/api-cheatsheet.html)** | **[Python Quickstart](https://softmata.gitlab.io/kinetic/tutorials/python/quickstart.html)**
 
 ## Quick Start
 
 ```rust
 use kinetic::prelude::*;
 
-// Load a robot from URDF
-let robot = Robot::from_urdf("path/to/panda.urdf")?;
-let chain = KinematicChain::extract(&robot, "panda_link0", "panda_link8")?;
-
-// Forward kinematics
-let q = vec![0.3, -0.5, 0.2, -1.5, 0.1, 1.0, 0.5];
-let pose = forward_kinematics(&robot, &chain, &q)?;
-
-// Inverse kinematics (DLS with adaptive damping)
-let config = IKConfig::dls()
-    .with_seed(robot.mid_configuration().to_vec())
-    .with_max_iterations(300);
-let solution = solve_ik(&robot, &chain, &pose, &config)?;
-println!("IK converged: {}", solution.converged);
+// One-liner: load robot, plan, get trajectory
+let result = plan("ur5e", &start_joints, &Goal::joints(goal_joints))?;
 ```
 
-## Features
+```python
+import kinetic
+import numpy as np
 
-| Feature | Description |
-|---------|-------------|
-| **Forward Kinematics** | Direct matrix chain, batch FK for planning |
-| **Jacobian** | 6xN geometric Jacobian, manipulability index |
-| **IK (DLS)** | Damped Least Squares with adaptive damping, null-space optimization |
-| **IK (FABRIK)** | Position-level FABRIK with DLS orientation refinement |
-| **Collision** | SoA sphere model, SIMD-accelerated (AVX2/NEON/scalar) |
-| **CAPT** | Collision-Affording Point Tree for <100ns environment queries |
-| **URDF** | Full URDF parsing with joint limits, collision geometry |
-| **Config** | TOML config for planning groups, end-effectors, named poses |
+robot = kinetic.Robot("ur5e")
+planner = kinetic.Planner(robot, planner_type="rrt_star")
+traj = planner.plan(start, kinetic.Goal.joints(goal))
 
-## Crate Structure
+for t in np.linspace(0, traj.duration, 100):
+    joints = traj.sample(t)
+```
 
-| Crate | Purpose |
-|-------|---------|
-| `kinetic` | Facade — re-exports everything via `prelude` |
-| `kinetic-core` | Pose, JointValues, Trajectory, Goal, Constraint |
-| `kinetic-robot` | URDF parser, Robot model, TOML config |
-| `kinetic-kinematics` | FK, Jacobian, IK (DLS, FABRIK) |
-| `kinetic-collision` | SIMD sphere collision, CAPT broadphase |
+## Performance vs MoveIt2
 
-## Performance
-
-All benchmarks on Panda-like 7-DOF robot (AMD Ryzen / Apple M-series):
-
-| Operation | Target | Measured |
-|-----------|--------|----------|
-| FK (7-DOF) | <1 µs | ~2 µs |
-| Jacobian (7-DOF) | <2 µs | ~2.4 µs |
-| IK DLS (7-DOF) | <500 µs | ~50 µs |
-| IK FABRIK (3-DOF) | <300 µs | ~160 µs |
-| Collision self-check (SIMD) | <500 ns | ~97 ns |
+| Operation | KINETIC | MoveIt2 | Speedup |
+|-----------|---------|---------|---------|
+| FK (7-DOF) | 324 ns | 5-10 us | **15-30x** |
+| IK (DLS) | 10.6 us | 5 ms | **470x** |
+| Self-collision | 9 ns | 50-100 us | **5,000x** |
+| Env collision (10 obs) | 507 ns | 50-100 us | **100x** |
+| Servo tick | 9.9 us | ~1 ms | **100x** |
+| Plan (cluttered) | 420 ms | 1,200 ms | **2.9x** |
+| Plan (narrow passage) | 415 ms | 3,000+ ms | **7.2x** |
 
 Run benchmarks: `cargo bench -p kinetic`
 
-## Examples
+## Features
 
-```sh
-# FK → IK roundtrip demo
-cargo run --example hello_fk_ik -p kinetic
+**Kinematics** -- 10 IK solvers (OPW, Paden-Kahan, DLS, FABRIK, SQP, Bio-IK), batch FK/IK, Jacobian, manipulability
 
-# Multiple IK solutions
-cargo run --example multiple_ik -p kinetic
+**Collision** -- SIMD-vectorized (AVX2/NEON/scalar), CAPT broadphase, 3-tier LOD (sphere/convex/mesh), CCD, SDF
 
-# Collision checking
-cargo run --example collision_check -p kinetic
+**Planning** -- 14 algorithms: RRT-Connect, RRT\*, BiRRT\*, BiTRRT, EST, KPIECE, PRM, CHOMP, STOMP, GCS, Cartesian, constrained, dual-arm
+
+**Trajectory** -- TOTP (time-optimal), trapezoidal, jerk-limited S-curve, cubic spline, blending, validation
+
+**Reactive** -- 500 Hz servo (twist/jog/pose-tracking), RMP multi-policy blending, collision deceleration
+
+**Task** -- Pick, place, multi-stage sequences with grasp generation
+
+**GPU** -- wgpu parallel-seed optimization (Vulkan/Metal), batch collision, CPU fallback
+
+**Dynamics** -- Featherstone bridge: inverse/forward dynamics, gravity compensation, mass matrix
+
+**Execution** -- RealTimeExecutor (500 Hz), SimExecutor, LogExecutor, safety watchdog
+
+**Python** -- Full PyO3 + numpy bindings, 22 classes, type stubs for IDE autocomplete
+
+**54 Robots** -- UR, Franka, KUKA, ABB, Fanuc, Kinova, xArm, and 47 more
+
+## Crate Architecture
+
+```
+kinetic (facade)
+├── kinetic-core          Pose, Goal, Trajectory, Constraint, Error
+├── kinetic-robot         URDF/MJCF/SDF parsing, 54 robot configs
+├── kinetic-kinematics    FK, IK (10 solvers), Jacobian, batch ops
+├── kinetic-collision     SIMD spheres, CAPT, ACM, mesh, LOD, CCD
+├── kinetic-dynamics      Featherstone: ID, FD, gravity comp, mass matrix
+├── kinetic-scene         Obstacles, attached objects, octree, pointcloud
+├── kinetic-planning      14 planners, pipeline, cost functions, dual-arm
+├── kinetic-trajectory    TOTP, trapezoidal, S-curve, spline, blending
+├── kinetic-reactive      Servo 500Hz, RMP 6-policy, EMA/Butterworth
+├── kinetic-task          Pick, place, sequence, grasp generation
+├── kinetic-execution     RealTime/Sim/Log executors, safety watchdog
+├── kinetic-gpu           wgpu optimizer, batch FK, SDF collision
+├── kinetic-grasp         Parallel jaw, suction, quality scoring
+├── kinetic-python        PyO3 + numpy bindings (22 classes)
+├── horus-kinetic         HORUS IPC bridge (optional)
+└── kinetic-viewer        3D visualization (optional)
 ```
 
-## Comparison vs MoveIt2
+## Installation
 
-| | KINETIC | MoveIt2 |
-|---|---------|---------|
-| Language | Rust | C++ |
-| Precision | f64 | f64 |
-| SIMD collision | AVX2/NEON auto-detect | No |
-| Build system | Cargo | CMake + colcon |
-| ROS dependency | None | Required |
-| Memory safety | Guaranteed | Manual |
-| Compile time | ~10s | Minutes |
+**Rust:**
+```toml
+[dependencies]
+kinetic = { path = "crates/kinetic" }
+```
+
+**Python:**
+```bash
+cd crates/kinetic-python
+maturin develop --release
+```
+
+## Examples
+
+```bash
+cargo run --example plan_simple -p kinetic
+cargo run --example collision_check -p kinetic
+cargo run --example servo_loop -p kinetic
+cargo run --example grasp_planning -p kinetic
+cargo run --example gpu_optimize -p kinetic
+```
 
 ## Testing
 
 ```bash
-# Unit tests (~30s)
-cargo test --lib --workspace
+# Full test suite (1,457+ tests)
+cargo test --workspace --exclude kinetic-gpu
 
-# Full test suite including integration tests
+# With GPU tests
 cargo test --workspace
 
-# Code coverage (80%+ target)
-cargo tarpaulin --lib --skip-clean --out html stdout
+# Coverage (85% target)
+cargo tarpaulin --config tarpaulin.toml
 ```
-
-See [docs/testing.md](docs/testing.md) for the full testing guide, test inventory, and coverage details.
 
 ## License
 
