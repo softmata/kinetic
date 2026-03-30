@@ -114,6 +114,10 @@ Coming from another framework?
 - **[From MoveIt2](migration/from-moveit2.md)** — Step-by-step migration with config translation
 - **[From Other Frameworks](migration/from-other-frameworks.md)** — Concept mapping for cuRobo, Drake, OMPL, PyBullet
 
+New to robotics?
+
+- **[Robotics Primer](concepts/robotics-primer.md)** — What are joints, FK, IK, and planning? Explained from zero, no prior knowledge needed
+
 Want to understand the algorithms?
 
 - **[Core Concepts](concepts/glossary.md)** — Glossary, FK, IK, collision, planning, trajectories explained

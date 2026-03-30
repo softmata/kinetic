@@ -16,6 +16,7 @@
 
 # Core Concepts
 
+- [Robotics Primer](concepts/robotics-primer.md)
 - [Glossary](concepts/glossary.md)
 - [Robots and URDF](concepts/robots-and-urdf.md)
 - [Coordinate Frames](concepts/coordinate-frames.md)
