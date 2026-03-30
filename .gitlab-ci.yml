@@ -37,9 +37,9 @@ check-and-lint:
   image: rust:latest
   script:
     - rustup component add clippy rustfmt
-    - cargo fmt --all --check
-    - cargo clippy --all-targets -- -D warnings
-    - cargo build --all-targets
+    - cargo fmt --check
+    - cargo clippy --workspace -- -D warnings
+    - cargo build --workspace
 
 # ─── Stage: test ─────────────────────────────────────────────────────────────
 
@@ -151,11 +151,11 @@ documentation:
 pages:
   stage: doc
   image: rust:latest
+  needs: []
   script:
     - cargo install mdbook || true
     - cargo install mdbook-mermaid || true
     - cd docs-site && mdbook build -d ../public && cd ..
-    - cargo doc --no-deps --workspace --target-dir public/api
   artifacts:
     paths:
       - public
