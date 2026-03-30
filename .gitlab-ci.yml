@@ -154,7 +154,7 @@ pages:
   needs: []
   script:
     - cargo install mdbook --version 0.4.44
-    - cargo install mdbook-mermaid --version 0.17.0
+    - cargo install mdbook-mermaid --version 0.14.0
     - export PATH="$CARGO_HOME/bin:$PATH"
     - cd docs-site && mdbook build -d ../public && cd ..
   artifacts:
