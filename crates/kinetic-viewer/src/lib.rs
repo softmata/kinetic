@@ -15,8 +15,26 @@
 //! VoxelDisplay (point clouds)
 //! ```
 
+#[cfg(feature = "visual")]
+pub mod app;
+#[cfg(feature = "visual")]
+pub mod collision_viz;
 pub mod egui_ui;
+#[cfg(feature = "visual")]
+pub mod gpu_buffers;
+#[cfg(feature = "visual")]
+pub mod gizmo;
+#[cfg(feature = "visual")]
+pub mod gpu_context;
 pub mod interaction;
+#[cfg(feature = "visual")]
+pub mod perception_viz;
+#[cfg(feature = "visual")]
+pub mod pipeline;
+#[cfg(feature = "visual")]
+pub mod test_utils;
+#[cfg(feature = "visual")]
+pub mod trajectory_viz;
 pub mod web_export;
 pub mod wgpu_renderer;
 
@@ -167,6 +185,65 @@ impl MeshData {
         Self { vertices, normals, indices }
     }
 
+    /// Load mesh from an STL file. Returns a placeholder cube on failure.
+    pub fn from_mesh_file(filename: &str, scale: [f64; 3]) -> Self {
+        // Try to load as STL
+        #[cfg(feature = "visual")]
+        {
+            if let Ok(mesh) = Self::from_stl(std::path::Path::new(filename), scale) {
+                return mesh;
+            }
+        }
+        // Fallback: placeholder cube at 5cm
+        let _ = (filename, scale);
+        let mut m = Self::cube();
+        for v in &mut m.vertices {
+            v[0] *= 0.05;
+            v[1] *= 0.05;
+            v[2] *= 0.05;
+        }
+        m
+    }
+
+    /// Load an STL file (binary or ASCII) and return a MeshData with smooth normals.
+    #[cfg(feature = "visual")]
+    pub fn from_stl(path: &std::path::Path, scale: [f64; 3]) -> Result<Self, std::io::Error> {
+        let mut file = std::fs::File::open(path)?;
+        let stl = stl_io::read_stl(&mut file)?;
+
+        // STL has per-face vertices (no sharing). We deduplicate via position hash
+        // for smooth normals, but for simplicity and correctness we'll use indexed
+        // per-face vertices with face normals (flat shading first, smooth later).
+        let mut vertices = Vec::with_capacity(stl.faces.len() * 3);
+        let mut normals = Vec::with_capacity(stl.faces.len() * 3);
+        let mut indices = Vec::with_capacity(stl.faces.len() * 3);
+
+        for face in &stl.faces {
+            let n = [face.normal[0], face.normal[1], face.normal[2]];
+            let base = vertices.len() as u32;
+
+            for vi in 0..3 {
+                let v = &stl.vertices[face.vertices[vi]];
+                vertices.push([
+                    v[0] * scale[0] as f32,
+                    v[1] * scale[1] as f32,
+                    v[2] * scale[2] as f32,
+                ]);
+                normals.push(n);
+            }
+
+            indices.push(base);
+            indices.push(base + 1);
+            indices.push(base + 2);
+        }
+
+        Ok(Self {
+            vertices,
+            normals,
+            indices,
+        })
+    }
+
     /// Generate mesh from URDF geometry shape.
     pub fn from_geometry(shape: &GeometryShape) -> Self {
         match shape {
@@ -185,7 +262,9 @@ impl MeshData {
                 for v in &mut m.vertices { v[0] *= *radius as f32 * 2.0; v[1] *= *radius as f32 * 2.0; v[2] *= *radius as f32 * 2.0; }
                 m
             }
-            GeometryShape::Mesh { .. } => Self::cube(), // placeholder for STL loading
+            GeometryShape::Mesh { filename, scale } => {
+                Self::from_mesh_file(filename, *scale)
+            }
         }
     }
 }
@@ -328,6 +407,10 @@ impl TrajectoryPlayer {
     pub fn set_looping(&mut self, looping: bool) { self.looping = looping; }
     pub fn is_playing(&self) -> bool { self.playing }
     pub fn progress(&self) -> f64 { self.t }
+    pub fn seek(&mut self, t: f64) { self.t = t.clamp(0.0, 1.0); }
+
+    /// Access the underlying trajectory (e.g., for ghost robot sampling).
+    pub fn trajectory(&self) -> &Trajectory { &self.trajectory }
 
     /// Advance playback by dt seconds. Returns current joint values.
     pub fn tick(&mut self, dt: f64) -> JointValues {

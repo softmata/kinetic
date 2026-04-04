@@ -432,7 +432,46 @@ fn geometry_to_mesh(shape: &GeometryShape) -> (Vec<[f64; 3]>, Vec<[usize; 3]>) {
         GeometryShape::Box { x, y, z } => make_box_mesh([*x, *y, *z]),
         GeometryShape::Sphere { radius } => make_sphere_mesh(*radius, 12, 8),
         GeometryShape::Cylinder { radius, length } => make_cylinder_mesh(*radius, *length, 12),
-        GeometryShape::Mesh { .. } => make_box_mesh([0.05, 0.05, 0.05]), // placeholder
+        GeometryShape::Mesh { filename, scale } => {
+            load_mesh_file(filename, *scale)
+                .unwrap_or_else(|| make_box_mesh([0.05, 0.05, 0.05]))
+        }
+    }
+}
+
+/// Try to load an STL mesh file and convert to export-compatible vertices/indices.
+///
+/// Returns `None` if the file cannot be loaded (missing file, unsupported format,
+/// or `visual` feature disabled), falling back to a placeholder box.
+fn load_mesh_file(filename: &str, scale: [f64; 3]) -> Option<(Vec<[f64; 3]>, Vec<[usize; 3]>)> {
+    #[cfg(feature = "visual")]
+    {
+        let path = std::path::Path::new(filename);
+        let mut file = std::fs::File::open(path).ok()?;
+        let stl = stl_io::read_stl(&mut file).ok()?;
+
+        let mut vertices = Vec::with_capacity(stl.faces.len() * 3);
+        let mut indices = Vec::with_capacity(stl.faces.len());
+
+        for face in &stl.faces {
+            let base = vertices.len();
+            for vi in 0..3 {
+                let v = &stl.vertices[face.vertices[vi]];
+                vertices.push([
+                    v[0] as f64 * scale[0],
+                    v[1] as f64 * scale[1],
+                    v[2] as f64 * scale[2],
+                ]);
+            }
+            indices.push([base, base + 1, base + 2]);
+        }
+
+        Some((vertices, indices))
+    }
+    #[cfg(not(feature = "visual"))]
+    {
+        let _ = (filename, scale);
+        None
     }
 }
 

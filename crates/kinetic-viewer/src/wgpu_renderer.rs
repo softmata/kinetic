@@ -1,15 +1,19 @@
-//! wgpu render pipeline for the kinetic 3D scene viewer.
+//! Data model and dry-run renderer for testing without a GPU.
 //!
-//! Consumes RenderCommands from the scene graph and renders to a wgpu surface.
-//! Feature-gated behind `visual` to keep the core viewer GPU-free.
+//! This module provides the stats-only renderer used when the `visual` feature
+//! is disabled. For actual GPU rendering, see [`gpu_buffers`] and [`app`].
+//! The types [`ViewUniforms`] and [`InstanceData`] are shared with the real
+//! GPU pipeline.
 //!
 //! # Architecture
 //!
 //! ```text
-//! RenderCommand → WgpuRenderer → wgpu Surface → pixels
+//! RenderCommand → WgpuRenderer → FrameStats (no GPU)
 //! ```
 
-use super::{Camera, Material, MeshData, MeshHandle, MeshRegistry, RenderCommand};
+use super::{Camera, MeshData, MeshHandle, MeshRegistry, RenderCommand};
+#[cfg(test)]
+use super::Material;
 use nalgebra::Matrix4;
 
 /// GPU-side mesh: uploaded vertex/index buffers.
@@ -280,7 +284,10 @@ impl WgpuRenderer {
         pixels
     }
 
-    /// Render text label at a 3D position (stub for font rendering).
+    /// Render text label at a 3D position.
+    ///
+    /// Stub in dry-run mode — increments draw call counter only.
+    /// Real text rendering requires a font atlas (e.g., glyph-brush).
     pub fn draw_text(&mut self, _text: &str, _world_pos: [f32; 3], _color: [f32; 4]) {
         self.frame_stats.draw_calls += 1;
     }

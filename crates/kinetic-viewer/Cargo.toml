@@ -10,4 +10,55 @@ repository.workspace = true
 [dependencies]
 kinetic-core = { path = "../kinetic-core" }
 kinetic-robot = { path = "../kinetic-robot" }
+kinetic-kinematics = { path = "../kinetic-kinematics", optional = true }
+kinetic-collision = { path = "../kinetic-collision", optional = true }
+kinetic-planning = { path = "../kinetic-planning", optional = true }
+kinetic-scene = { path = "../kinetic-scene", optional = true }
+kinetic-reactive = { path = "../kinetic-reactive", optional = true }
 nalgebra = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+bytemuck = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+
+# GPU rendering (optional — feature-gated)
+wgpu = { workspace = true, optional = true }
+winit = { workspace = true, optional = true }
+egui = { workspace = true, optional = true }
+egui-wgpu = { workspace = true, optional = true }
+egui-winit = { workspace = true, optional = true }
+pollster = { workspace = true, optional = true }
+
+# Mesh loading
+stl_io = { workspace = true, optional = true }
+
+# CLI (for binary target)
+clap = { workspace = true, optional = true }
+env_logger = { workspace = true, optional = true }
+
+# Screenshot/image export
+image = { workspace = true, optional = true }
+
+[features]
+default = ["visual"]
+visual = [
+    "dep:wgpu",
+    "dep:winit",
+    "dep:egui",
+    "dep:egui-wgpu",
+    "dep:egui-winit",
+    "dep:pollster",
+    "dep:stl_io",
+    "dep:image",
+    "dep:kinetic-kinematics",
+    "dep:kinetic-collision",
+    "dep:kinetic-planning",
+    "dep:kinetic-scene",
+    "dep:kinetic-reactive",
+]
+cli = ["visual", "dep:clap", "dep:env_logger"]
+
+[[bin]]
+name = "kinetic-viewer"
+required-features = ["cli"]

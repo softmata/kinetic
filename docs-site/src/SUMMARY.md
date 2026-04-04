@@ -63,6 +63,7 @@
 - [Production Deployment](guides/production-deployment.md)
 - [Hardware Integration](guides/hardware-integration.md)
 - [HORUS Integration](guides/horus-integration.md)
+- [3D Visualization](guides/visualization.md)
 - [Troubleshooting](guides/troubleshooting.md)
 - [Extending Kinetic](guides/extending-kinetic.md)
 

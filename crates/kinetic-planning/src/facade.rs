@@ -54,6 +54,26 @@ pub enum PlannerType {
     Auto,
 }
 
+impl PlannerType {
+    /// Parse a planner type from a string identifier.
+    ///
+    /// Recognized identifiers (case-insensitive):
+    /// `rrt_connect`, `rrt_star`, `bi_rrt_star`, `bitrrt`, `est`, `kpiece`, `prm`, `gcs`, `auto`.
+    pub fn from_id(id: &str) -> Self {
+        match id.to_lowercase().as_str() {
+            "rrt_connect" => PlannerType::RRTConnect,
+            "rrt_star" => PlannerType::RRTStar,
+            "bi_rrt_star" => PlannerType::BiRRTStar,
+            "bitrrt" => PlannerType::BiTRRT,
+            "est" => PlannerType::EST,
+            "kpiece" => PlannerType::KPIECE,
+            "prm" => PlannerType::PRM,
+            "gcs" => PlannerType::GCS,
+            _ => PlannerType::Auto,
+        }
+    }
+}
+
 /// Unified motion planner facade.
 ///
 /// Wraps RRT-Connect (and future planners) behind a single interface.
@@ -152,10 +172,15 @@ impl Planner {
         self
     }
 
-    /// Set the planner type.
+    /// Set the planner type (builder pattern — consumes self).
     pub fn with_planner_type(mut self, planner_type: PlannerType) -> Self {
         self.planner_type = planner_type;
         self
+    }
+
+    /// Set the planner type in-place (useful when planner is stored as a field).
+    pub fn set_planner_type(&mut self, planner_type: PlannerType) {
+        self.planner_type = planner_type;
     }
 
     /// Set RRT-specific config.

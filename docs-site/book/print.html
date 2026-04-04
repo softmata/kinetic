@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c62e6abf.js";
+            window.path_to_searchindex_js = "searchindex-709a2499.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-a6d67ab9.js"></script>
+        <script src="toc-2f1c048c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -289,6 +289,10 @@ traj = kinetic.plan("ur5e", start, kinetic.Goal.joints([1.0, -0.5, 0.3, 0.2, -0.
 <ul>
 <li><strong><a href="#from-moveit2">From MoveIt2</a></strong> — Step-by-step migration with config translation</li>
 <li><strong><a href="#from-other-frameworks">From Other Frameworks</a></strong> — Concept mapping for cuRobo, Drake, OMPL, PyBullet</li>
+</ul>
+<p>New to robotics?</p>
+<ul>
+<li><strong><a href="#robotics-primer">Robotics Primer</a></strong> — What are joints, FK, IK, and planning? Explained from zero, no prior knowledge needed</li>
 </ul>
 <p>Want to understand the algorithms?</p>
 <ul>
@@ -749,6 +753,235 @@ fn main() -&gt; Result&lt;()&gt; {
 <li><a href="#pick-and-place">Pick and Place</a> — complete workflow</li>
 <li><a href="#production-deployment">Production Deployment</a> — deploying on real robots</li>
 </ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="robotics-primer"><a class="header" href="#robotics-primer">Robotics Primer</a></h1>
+<p>New to robotics? This page explains the core ideas you need before using
+kinetic. No prior robotics knowledge assumed – just basic programming.</p>
+<h2 id="what-is-a-robot-arm"><a class="header" href="#what-is-a-robot-arm">What is a robot arm?</a></h2>
+<p>A robot arm is a chain of rigid metal pieces (<strong>links</strong>) connected by
+motorized hinges (<strong>joints</strong>). Think of your own arm: your upper arm and
+forearm are links, your elbow is a joint.</p>
+<pre class="mermaid">graph LR
+    Base[Base&lt;br/&gt;bolted to table] --- J1((Joint 1&lt;br/&gt;rotate left/right))
+    J1 --- L1[Link 1&lt;br/&gt;shoulder]
+    L1 --- J2((Joint 2&lt;br/&gt;tilt up/down))
+    J2 --- L2[Link 2&lt;br/&gt;upper arm]
+    L2 --- J3((Joint 3&lt;br/&gt;tilt up/down))
+    J3 --- L3[Link 3&lt;br/&gt;forearm]
+    L3 --- J4((Joint 4&lt;br/&gt;rotate wrist))
+    J4 --- EE[End-effector&lt;br/&gt;gripper / tool]
+
+    style Base fill:#666,color:#fff
+    style EE fill:#3ddc84,color:#000
+    style J1 fill:#4a9eff,color:#fff
+    style J2 fill:#4a9eff,color:#fff
+    style J3 fill:#4a9eff,color:#fff
+    style J4 fill:#4a9eff,color:#fff
+</pre>
+
+<p>The <strong>end-effector</strong> (EE) is whatever’s at the tip: a gripper, a welding
+torch, a camera, or a suction cup. That’s the part that does useful work.</p>
+<h2 id="degrees-of-freedom-dof"><a class="header" href="#degrees-of-freedom-dof">Degrees of freedom (DOF)</a></h2>
+<p>Each joint adds one <strong>degree of freedom</strong> – one independent axis the robot
+can move along. A typical industrial arm has 6 DOF (6 joints), which is
+exactly enough to place the end-effector at any position <em>and</em> orientation
+in 3D space. A 7-DOF arm (like the Franka Panda) has one extra joint,
+giving it flexibility to reach the same pose in multiple ways.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>DOF</th><th>What it means</th><th>Example robots</th></tr>
+</thead>
+<tbody>
+<tr><td>3</td><td>Can reach positions, but can’t control orientation</td><td>Simple pick-place</td></tr>
+<tr><td>6</td><td>Full position + orientation control</td><td>UR5e, KUKA, ABB</td></tr>
+<tr><td>7</td><td>Redundant – multiple ways to reach the same pose</td><td>Franka Panda, KUKA iiwa</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="joint-values-the-robots-configuration"><a class="header" href="#joint-values-the-robots-configuration">Joint values: the robot’s “configuration”</a></h2>
+<p>At any moment, each joint has an angle (in radians). The list of all joint
+angles is called the <strong>configuration</strong> or <strong>joint state</strong>. For a 6-DOF
+robot, it’s a list of 6 numbers:</p>
+<pre><code class="language-python">joints = [0.0, -1.57, 0.0, -1.57, 0.0, 0.0]  # 6 angles in radians
+</code></pre>
+<p>This is the most fundamental concept in kinetic: nearly everything takes
+a list of joint values as input.</p>
+<h2 id="forward-kinematics-where-is-the-tool"><a class="header" href="#forward-kinematics-where-is-the-tool">Forward kinematics: “where is the tool?”</a></h2>
+<p>Given a configuration (list of joint angles), <strong>forward kinematics</strong> (FK)
+computes where the end-effector is in 3D space. The result is a <strong>pose</strong>:
+a position (XYZ in meters) plus an orientation (which way the tool points).</p>
+<pre class="mermaid">graph LR
+    Joints["[0.0, -1.57, 0.0, -1.57, 0.0, 0.0]&lt;br/&gt;joint angles"] --&gt;|FK| Pose["Position: (0.4, 0.0, 0.6)&lt;br/&gt;Orientation: pointing down"]
+
+    style Joints fill:#4a9eff,color:#fff
+    style Pose fill:#3ddc84,color:#000
+</pre>
+
+<p>FK is fast (324 nanoseconds) and always has exactly one answer.</p>
+<pre><code class="language-python">robot = kinetic.Robot("ur5e")
+pose = robot.fk(joints)   # 4x4 matrix encoding position + orientation
+print(pose[:3, 3])        # XYZ position in meters
+</code></pre>
+<h2 id="inverse-kinematics-how-do-i-reach-this-spot"><a class="header" href="#inverse-kinematics-how-do-i-reach-this-spot">Inverse kinematics: “how do I reach this spot?”</a></h2>
+<p><strong>Inverse kinematics</strong> (IK) is the reverse: given a desired pose for the
+end-effector, find the joint angles that put it there.</p>
+<pre class="mermaid">graph LR
+    Pose["Target: reach (0.4, 0.2, 0.5)&lt;br/&gt;pointing down"] --&gt;|IK| Joints["[0.3, -1.2, 0.5, ...]&lt;br/&gt;joint angles"]
+
+    style Pose fill:#3ddc84,color:#000
+    style Joints fill:#4a9eff,color:#fff
+</pre>
+
+<p>IK is harder than FK because:</p>
+<ul>
+<li>There might be <strong>multiple solutions</strong> (elbow up vs. elbow down)</li>
+<li>There might be <strong>no solution</strong> (the target is out of reach)</li>
+<li>Near <strong>singularities</strong>, solutions become unstable</li>
+</ul>
+<p>Kinetic has 10 different IK solvers – it automatically picks the best one
+for your robot.</p>
+<pre><code class="language-python">target = robot.fk([0.5, -1.0, 0.5, -0.5, 0.5, 0.0])
+joints = robot.ik(target)  # finds joint angles that reach this pose
+</code></pre>
+<h2 id="collision-detection-will-i-hit-something"><a class="header" href="#collision-detection-will-i-hit-something">Collision detection: “will I hit something?”</a></h2>
+<p>Before moving, we need to check: will the robot collide with the table,
+a wall, or itself? Collision detection answers this in under a microsecond
+by approximating the robot’s links as simple shapes (spheres) and checking
+for overlaps.</p>
+<pre class="mermaid">graph TB
+    Config[Joint angles] --&gt; FK[Compute link positions]
+    FK --&gt; Spheres[Approximate each link&lt;br/&gt;as spheres]
+    Spheres --&gt; Check{Any overlaps?}
+    Check --&gt;|No| Safe["Safe to move"]
+    Check --&gt;|Yes| Blocked["Collision! Don't move"]
+
+    style Safe fill:#3ddc84,color:#000
+    style Blocked fill:#ff6b6b,color:#fff
+</pre>
+
+<pre><code class="language-python">scene = kinetic.Scene(robot)
+scene.add("table", kinetic.Shape.cuboid(0.5, 0.5, 0.01), table_pose)
+print(scene.check_collision(joints))  # True or False
+</code></pre>
+<h2 id="motion-planning-find-a-safe-path"><a class="header" href="#motion-planning-find-a-safe-path">Motion planning: “find a safe path”</a></h2>
+<p>You know where you are (start) and where you want to be (goal). But you
+can’t just move in a straight line – there might be obstacles in the way.</p>
+<p>A <strong>motion planner</strong> explores possible paths through the robot’s
+configuration space and finds one that avoids all collisions. Think of it
+like a GPS navigator for the robot’s joints.</p>
+<pre class="mermaid">graph LR
+    Start["Start config&lt;br/&gt;[0, -1.57, 0, ...]"] --&gt; Planner["Motion Planner&lt;br/&gt;explores safe paths"]
+    Planner --&gt; Path["Path: 50 waypoints&lt;br/&gt;all collision-free"]
+
+    Obs["Obstacles&lt;br/&gt;table, mug, wall"] --&gt; Planner
+
+    style Start fill:#4a9eff,color:#fff
+    style Path fill:#3ddc84,color:#000
+    style Obs fill:#ff6b6b,color:#fff
+</pre>
+
+<pre><code class="language-python">planner = kinetic.Planner(robot, scene=scene)
+goal = kinetic.Goal.joints([1.0, -0.8, 0.6, -0.5, 0.8, 0.3])
+traj = planner.plan(start, goal)
+</code></pre>
+<h2 id="trajectory-how-fast-should-i-move"><a class="header" href="#trajectory-how-fast-should-i-move">Trajectory: “how fast should I move?”</a></h2>
+<p>A planner gives you a <strong>path</strong> (a list of waypoints), but not <em>when</em> to
+be at each point. A real motor needs to know: how fast should I spin at
+each moment? <strong>Trajectory generation</strong> adds timing, velocity, and
+acceleration to the path so the robot moves smoothly within its physical
+limits.</p>
+<pre class="mermaid">graph LR
+    Path["Path&lt;br/&gt;50 waypoints&lt;br/&gt;no timing"] --&gt; TimeParam["Time parameterization&lt;br/&gt;add velocity + acceleration"]
+    TimeParam --&gt; Traj["Trajectory&lt;br/&gt;50 waypoints&lt;br/&gt;with timestamps"]
+    Traj --&gt; Motor["Send to motors&lt;br/&gt;at 500 Hz"]
+
+    style Path fill:#4a9eff,color:#fff
+    style Traj fill:#3ddc84,color:#000
+    style Motor fill:#ffd93d,color:#000
+</pre>
+
+<pre><code class="language-python"># traj already has timing (planner does it automatically)
+print(f"Duration: {traj.duration:.2f} seconds")
+
+# Sample at any point in time
+joints_at_halfway = traj.sample(traj.duration / 2)
+</code></pre>
+<h2 id="urdf-the-robots-blueprint"><a class="header" href="#urdf-the-robots-blueprint">URDF: the robot’s blueprint</a></h2>
+<p>How does kinetic know what a UR5e looks like? From a <strong>URDF file</strong>
+(Unified Robot Description Format) – an XML file that describes every
+link’s shape, every joint’s type and limits, and how they connect. Think
+of it as a blueprint.</p>
+<p>Kinetic ships 54 built-in robots so you don’t need to write URDF files.
+Just say <code>Robot("ur5e")</code> and it loads everything.</p>
+<h2 id="putting-it-all-together"><a class="header" href="#putting-it-all-together">Putting it all together</a></h2>
+<p>A typical robotics workflow in kinetic:</p>
+<pre class="mermaid">graph TB
+    Load["1. Load robot&lt;br/&gt;Robot('ur5e')"] --&gt; Scene["2. Build scene&lt;br/&gt;add table, objects"]
+    Scene --&gt; Plan["3. Plan motion&lt;br/&gt;find collision-free path"]
+    Plan --&gt; Time["4. Time parameterize&lt;br/&gt;add velocity limits"]
+    Time --&gt; Validate["5. Validate&lt;br/&gt;check all limits"]
+    Validate --&gt; Execute["6. Execute&lt;br/&gt;stream to hardware at 500Hz"]
+
+    style Load fill:#4a9eff,color:#fff
+    style Execute fill:#3ddc84,color:#000
+</pre>
+
+<pre><code class="language-python">import kinetic
+import numpy as np
+
+# 1. Load
+robot = kinetic.Robot("ur5e")
+
+# 2. Scene
+scene = kinetic.Scene(robot)
+scene.add("table", kinetic.Shape.cuboid(0.5, 0.5, 0.01), table_pose)
+
+# 3. Plan
+planner = kinetic.Planner(robot, scene=scene)
+start = np.array([0.0, -1.57, 0.0, -1.57, 0.0, 0.0])
+goal = kinetic.Goal.joints(np.array([1.0, -0.8, 0.6, -0.5, 0.8, 0.3]))
+traj = planner.plan(start, goal)
+
+# 4-5. Already done (planner auto-parameterizes and validates)
+
+# 6. Execute
+def send(positions, velocities):
+    my_robot_driver.set_joints(positions)
+
+executor = kinetic.RealTimeExecutor(rate_hz=500)
+result = executor.execute(traj, send)
+print(f"Done in {result['actual_duration']:.2f}s")
+</code></pre>
+<h2 id="jargon-cheat-sheet"><a class="header" href="#jargon-cheat-sheet">Jargon cheat sheet</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Term</th><th>Plain English</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>DOF</strong></td><td>Number of independent joints</td></tr>
+<tr><td><strong>Configuration</strong></td><td>List of all joint angles</td></tr>
+<tr><td><strong>FK</strong></td><td>Joint angles in, tool position out</td></tr>
+<tr><td><strong>IK</strong></td><td>Tool position in, joint angles out</td></tr>
+<tr><td><strong>C-space</strong></td><td>The imaginary space where each joint angle is one dimension</td></tr>
+<tr><td><strong>Waypoint</strong></td><td>One configuration along a path</td></tr>
+<tr><td><strong>Trajectory</strong></td><td>A path with timestamps and velocities</td></tr>
+<tr><td><strong>End-effector</strong></td><td>The tool at the tip of the arm</td></tr>
+<tr><td><strong>Singularity</strong></td><td>A configuration where the robot “locks up” mathematically</td></tr>
+<tr><td><strong>URDF</strong></td><td>XML file describing a robot’s geometry and joints</td></tr>
+<tr><td><strong>Scene</strong></td><td>The robot’s environment (tables, walls, objects)</td></tr>
+<tr><td><strong>Planner</strong></td><td>Algorithm that finds collision-free paths</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="next-4"><a class="header" href="#next-4">Next</a></h2>
+<p>Ready to code? Start here:</p>
+<ul>
+<li><strong><a href="#installation">Installation</a></strong> – get kinetic running</li>
+<li><strong><a href="#hello-world">Hello World</a></strong> – your first 5 lines</li>
+<li><strong><a href="#python-quickstart">Python Quickstart</a></strong> – full Python tutorial</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="glossary"><a class="header" href="#glossary">Glossary</a></h1>
 <p>Alphabetical definitions of key terms used throughout kinetic. Each entry gives a concise definition followed by a short explanation. Cross-references point to the concept page where the term is discussed in depth.</p>
@@ -2433,7 +2666,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Use <code>robot.mid_configuration()</code> vs <code>vec![0.0; 7]</code> as the seed and see how it affects iteration count</li>
 <li>Load a built-in robot with <code>Robot::from_name("ur5e")</code> instead of inline URDF</li>
 </ul>
-<h2 id="next-4"><a class="header" href="#next-4">Next</a></h2>
+<h2 id="next-5"><a class="header" href="#next-5">Next</a></h2>
 <ul>
 <li><a href="#ik-solver-selection">IK Solver Selection</a> — choosing the right solver for your robot</li>
 <li><a href="#multiple-ik-solutions">Multiple IK Solutions</a> — finding diverse solutions with random seeds</li>
@@ -2567,7 +2800,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Try <code>Goal::Named("home".into())</code> if the robot has named configurations in its URDF</li>
 <li>Use <code>result.waypoints</code> to iterate over the planned joint-space path</li>
 </ul>
-<h2 id="next-5"><a class="header" href="#next-5">Next</a></h2>
+<h2 id="next-6"><a class="header" href="#next-6">Next</a></h2>
 <ul>
 <li><a href="#planning-with-obstacles">Planning with Obstacles</a> — adding collision objects to the scene</li>
 <li><a href="#pick-and-place">Pick and Place</a> — full planning-to-execution pipeline</li>
@@ -2715,7 +2948,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Add more obstacles with <code>scene.add_sphere("ball", radius, position)</code> and see how planning time changes</li>
 <li>Use <code>scene.remove("pipe")</code> to remove an obstacle and observe the shorter path</li>
 </ul>
-<h2 id="next-6"><a class="header" href="#next-6">Next</a></h2>
+<h2 id="next-7"><a class="header" href="#next-7">Next</a></h2>
 <ul>
 <li><a href="#collision-checking">Collision Checking</a> — low-level sphere-model collision detection</li>
 <li><a href="#pick-and-place">Pick and Place</a> — full workflow from planning through execution</li>
@@ -2869,7 +3102,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Try <code>IKConfig::with_fallback()</code> which attempts Full6D then falls back to PositionOnly</li>
 <li>Set <code>IKConfig { solver: IKSolver::DLS { damping: 0.001 }, .. }</code> vs <code>damping: 0.1</code> and observe convergence behavior near singularities</li>
 </ul>
-<h2 id="next-7"><a class="header" href="#next-7">Next</a></h2>
+<h2 id="next-8"><a class="header" href="#next-8">Next</a></h2>
 <ul>
 <li><a href="#multiple-ik-solutions">Multiple IK Solutions</a> — finding diverse configurations</li>
 <li><a href="#servo-control">Servo Control</a> — real-time IK in a control loop</li>
@@ -3037,7 +3270,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Try a 6-DOF robot (UR5e) and observe that it typically has fewer distinct solutions than a 7-DOF robot</li>
 <li>Use <code>solution.condition_number</code> to filter out near-singular solutions</li>
 </ul>
-<h2 id="next-8"><a class="header" href="#next-8">Next</a></h2>
+<h2 id="next-9"><a class="header" href="#next-9">Next</a></h2>
 <ul>
 <li><a href="#collision-checking">Collision Checking</a> — verifying solutions are collision-free</li>
 <li><a href="#planning-basics">Planning Basics</a> — using the planner instead of raw IK</li>
@@ -3201,7 +3434,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Compare <code>self_collision</code> results between a straight and a folded arm configuration</li>
 <li>Use <code>spheres.min_distance(&amp;obstacles)</code> instead of <code>collides_with</code> to get the closest approach distance</li>
 </ul>
-<h2 id="next-9"><a class="header" href="#next-9">Next</a></h2>
+<h2 id="next-10"><a class="header" href="#next-10">Next</a></h2>
 <ul>
 <li><a href="#planning-with-obstacles">Planning with Obstacles</a> — using collision checking in a planner</li>
 <li><a href="#servo-control">Servo Control</a> — real-time collision avoidance in control loops</li>
@@ -3363,7 +3596,7 @@ fn main() -&gt; std::result::Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; 
 <li>Move the table obstacle closer to the arm and observe <code>is_near_collision</code> and <code>min_obstacle_distance</code></li>
 <li>Increase <code>rate_hz</code> to 500 and compare the smoothness of the end-effector trajectory</li>
 </ul>
-<h2 id="next-10"><a class="header" href="#next-10">Next</a></h2>
+<h2 id="next-11"><a class="header" href="#next-11">Next</a></h2>
 <ul>
 <li><a href="#grasp-planning">Grasp Planning</a> — generating grasp candidates for objects</li>
 <li><a href="#pick-and-place">Pick and Place</a> — combining servo with task planning</li>
@@ -3514,7 +3747,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Use <code>GraspConfig { check_collision: Some(scene.clone()), .. }</code> to filter out grasps that collide with the scene</li>
 <li>Combine with IK: for each grasp candidate, solve IK to check if the arm can reach the grasp pose</li>
 </ul>
-<h2 id="next-11"><a class="header" href="#next-11">Next</a></h2>
+<h2 id="next-12"><a class="header" href="#next-12">Next</a></h2>
 <ul>
 <li><a href="#pick-and-place">Pick and Place</a> — using grasps in a full pick-place pipeline</li>
 <li><a href="#task-sequencing">Task Sequencing</a> — composing grasps into multi-stage tasks</li>
@@ -3683,7 +3916,7 @@ fn main() -&gt; Result&lt;()&gt; {
 <li>Use <code>TrajectoryValidator</code> to check velocity and acceleration limits before execution</li>
 <li>Call <code>planner.fk(&amp;exec_result.final_positions)</code> to verify the arm reached the goal pose</li>
 </ul>
-<h2 id="next-12"><a class="header" href="#next-12">Next</a></h2>
+<h2 id="next-13"><a class="header" href="#next-13">Next</a></h2>
 <ul>
 <li><a href="#task-sequencing">Task Sequencing</a> — multi-stage pick-place sequences</li>
 <li><a href="#gpu-optimization">GPU Optimization</a> — GPU-accelerated trajectory optimization</li>
@@ -3844,7 +4077,7 @@ fn main() -&gt; std::result::Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; 
 <li>Nest sequences: <code>Task::sequence(vec![pick_sequence, place_sequence])</code> for modular task composition</li>
 <li>Apply <code>apply_scene_diffs(&amp;mut scene, &amp;solution)</code> to update the scene after execution and verify the cup moved</li>
 </ul>
-<h2 id="next-13"><a class="header" href="#next-13">Next</a></h2>
+<h2 id="next-14"><a class="header" href="#next-14">Next</a></h2>
 <ul>
 <li><a href="#gpu-optimization">GPU Optimization</a> — GPU-accelerated trajectory optimization</li>
 <li><a href="#grasp-planning">Grasp Planning</a> — generating grasp candidates automatically</li>
@@ -3998,7 +4231,7 @@ fn main() -&gt; kinetic::core::Result&lt;()&gt; {
 <li>Remove all obstacles and verify the optimizer produces a near-straight-line trajectory</li>
 <li>Try <code>GpuConfig { collision_weight: 0.0, .. }</code> to disable collision checking and see the difference in trajectory shape</li>
 </ul>
-<h2 id="next-14"><a class="header" href="#next-14">Next</a></h2>
+<h2 id="next-15"><a class="header" href="#next-15">Next</a></h2>
 <ul>
 <li><a href="#planning-basics">Planning Basics</a> — CPU-based RRT planning for comparison</li>
 <li><a href="#pick-and-place">Pick and Place</a> — using optimized trajectories in a full pipeline</li>
@@ -4106,7 +4339,7 @@ goal_named = kinetic.Goal.named("home")      # named configuration
 help(kinetic.Robot.ik)
 help(kinetic.Planner.plan)
 </code></pre>
-<h2 id="next-15"><a class="header" href="#next-15">Next</a></h2>
+<h2 id="next-16"><a class="header" href="#next-16">Next</a></h2>
 <ul>
 <li><a href="#planning-in-python">Planning in Python</a> – scenes, constraints, Cartesian planning</li>
 <li><a href="#trajectories-and-numpy">Trajectories and NumPy</a> – export, visualize, validate</li>
@@ -4227,7 +4460,7 @@ try:
 except ValueError as e:
     print(f"IK failed: {e}")
 </code></pre>
-<h2 id="next-16"><a class="header" href="#next-16">Next</a></h2>
+<h2 id="next-17"><a class="header" href="#next-17">Next</a></h2>
 <ul>
 <li><a href="#trajectories-and-numpy">Trajectories and NumPy</a> – export, time-parameterize, plot</li>
 <li><a href="#servo-control-in-python">Servo Control</a> – real-time reactive control</li>
@@ -4360,7 +4593,7 @@ print(f"Loaded: {traj_loaded.num_waypoints} wp, {traj_loaded.duration:.3f}s")
 for i, wp in enumerate(waypoints[:3]):
     print(f"Waypoint {i}: {wp}")
 </code></pre>
-<h2 id="next-17"><a class="header" href="#next-17">Next</a></h2>
+<h2 id="next-18"><a class="header" href="#next-18">Next</a></h2>
 <ul>
 <li><a href="#servo-control-in-python">Servo Control</a> – real-time reactive control</li>
 <li><a href="#pick-and-place-in-python">Pick and Place</a> – full manipulation workflow</li>
@@ -4450,7 +4683,7 @@ for step in range(1000):
         print(f"step {step:4d}  EE=[{ee[0]:.3f}, {ee[1]:.3f}, {ee[2]:.3f}]  "
               f"manip={m:.4f}")
 </code></pre>
-<h2 id="next-18"><a class="header" href="#next-18">Next</a></h2>
+<h2 id="next-19"><a class="header" href="#next-19">Next</a></h2>
 <ul>
 <li><a href="#pick-and-place-in-python">Pick and Place</a> – full manipulation workflow</li>
 <li><a href="#trajectories-and-numpy">Trajectories and NumPy</a> – export and visualize paths</li>
@@ -4608,7 +4841,7 @@ executor.clear()
 gen = kinetic.GraspGenerator(suction)
 grasps = gen.from_shape("cuboid", box_half, box_pose, num_candidates=50)
 </code></pre>
-<h2 id="next-19"><a class="header" href="#next-19">Next</a></h2>
+<h2 id="next-20"><a class="header" href="#next-20">Next</a></h2>
 <ul>
 <li><a href="#python-quickstart">Python Quickstart</a> – review the basics</li>
 <li><a href="#planning-in-python">Planning in Python</a> – constraints and Cartesian paths</li>
@@ -4703,7 +4936,7 @@ print("Max torques per joint (Nm):")
 for name, t in zip(robot.joint_names, max_torques):
     print(f"  {name}: {t:.2f}")
 </code></pre>
-<h2 id="next-20"><a class="header" href="#next-20">Next</a></h2>
+<h2 id="next-21"><a class="header" href="#next-21">Next</a></h2>
 <ul>
 <li><a href="#gpu-acceleration-in-python">GPU Acceleration</a> – parallel trajectory optimization</li>
 <li><a href="#hardware-execution-in-python">Hardware Execution</a> – deploy to real robots</li>
@@ -4811,7 +5044,7 @@ gpu_traj = opt.optimize(start, goal, scene=scene)
 print(f"RRT: {rrt_traj.num_waypoints} waypoints")
 print(f"GPU: {gpu_traj.num_waypoints} waypoints")
 </code></pre>
-<h2 id="next-21"><a class="header" href="#next-21">Next</a></h2>
+<h2 id="next-22"><a class="header" href="#next-22">Next</a></h2>
 <ul>
 <li><a href="#hardware-execution-in-python">Hardware Execution</a> – deploy trajectories to real robots</li>
 <li><a href="#dynamics-in-python">Dynamics</a> – torque feasibility checking</li>
@@ -5012,7 +5245,7 @@ for i in range(len(times)):
 # executor = kinetic.RealTimeExecutor.safe(robot, rate_hz=500)
 # result = executor.execute(traj, send, feedback=feedback)
 </code></pre>
-<h2 id="next-22"><a class="header" href="#next-22">Next</a></h2>
+<h2 id="next-23"><a class="header" href="#next-23">Next</a></h2>
 <ul>
 <li><a href="#dynamics-in-python">Dynamics</a> – torque feasibility checking</li>
 <li><a href="#gpu-acceleration-in-python">GPU Acceleration</a> – faster trajectory optimization</li>
@@ -6049,6 +6282,174 @@ cargo build -p horus-kinetic --features horus-ipc
 <p>The <code>horus-ipc</code> feature adds a compile-time dependency on HORUS.
 Without it, the crate is fully self-contained and has no HORUS
 dependency at all.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="3d-visualization"><a class="header" href="#3d-visualization">3D Visualization</a></h1>
+<p>The <code>kinetic-viewer</code> crate provides an interactive 3D viewer for robot
+visualization, motion planning, and trajectory playback. It includes both a
+windowed GUI (with egui panels) and a headless renderer for CI pipelines and
+screenshot generation.</p>
+<h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
+<p>Launch the viewer for a built-in robot:</p>
+<pre><code class="language-bash">cargo run -p kinetic-viewer --features cli -- --robot ur5e
+</code></pre>
+<p>List all 54 supported robots:</p>
+<pre><code class="language-bash">cargo run -p kinetic-viewer --features cli -- --list-robots
+</code></pre>
+<p>Load a custom URDF file:</p>
+<pre><code class="language-bash">cargo run -p kinetic-viewer --features cli -- --robot path/to/robot.urdf
+</code></pre>
+<h2 id="features"><a class="header" href="#features">Features</a></h2>
+<h3 id="interactive-gui"><a class="header" href="#interactive-gui">Interactive GUI</a></h3>
+<p>The viewer opens a wgpu-rendered window with egui side panels:</p>
+<ul>
+<li><strong>Joint sliders</strong> – drag individual joints to see the robot move in real time</li>
+<li><strong>Planning panel</strong> – set start/goal configurations and run RRT, PRM, or other planners</li>
+<li><strong>Servo panel</strong> – real-time velocity-based end-effector control</li>
+<li><strong>Constraint panel</strong> – visualize joint limits and workspace constraints</li>
+<li><strong>Scene objects</strong> – add/remove obstacles and inspection targets</li>
+<li><strong>Trajectory playback</strong> – animate planned paths with speed control and looping</li>
+<li><strong>Collision debug</strong> – toggle sphere model visualization</li>
+</ul>
+<h3 id="rendering"><a class="header" href="#rendering">Rendering</a></h3>
+<ul>
+<li>Hardware-accelerated via wgpu (Vulkan, Metal, DX12)</li>
+<li>Grid floor, coordinate axes, and wireframe overlays</li>
+<li>Per-link coloring and transparency for ghost robots</li>
+<li>Trajectory trail visualization</li>
+</ul>
+<h3 id="headless-rendering"><a class="header" href="#headless-rendering">Headless Rendering</a></h3>
+<p>The <code>HeadlessRenderer</code> renders to an offscreen texture without a window. It
+works with software Vulkan (lavapipe) for CI environments and with NVIDIA/AMD
+GPUs for production screenshots.</p>
+<h2 id="keyboard-shortcuts"><a class="header" href="#keyboard-shortcuts">Keyboard Shortcuts</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Key</th><th>Action</th></tr>
+</thead>
+<tbody>
+<tr><td>G</td><td>Toggle grid</td></tr>
+<tr><td>A</td><td>Toggle coordinate axes</td></tr>
+<tr><td>T</td><td>Toggle trajectory trail</td></tr>
+<tr><td>C</td><td>Toggle collision debug spheres</td></tr>
+<tr><td>W</td><td>Toggle collision wireframe</td></tr>
+<tr><td>V</td><td>Toggle voxel display</td></tr>
+<tr><td>P</td><td>Toggle point cloud</td></tr>
+<tr><td>R</td><td>Reset camera to default position</td></tr>
+<tr><td>F</td><td>Focus camera on goal marker</td></tr>
+<tr><td>Z</td><td>Undo last interaction</td></tr>
+<tr><td>Space</td><td>Play/pause trajectory</td></tr>
+<tr><td>F1</td><td>Show/hide keyboard shortcuts</td></tr>
+<tr><td>F3</td><td>Show/hide stats overlay</td></tr>
+<tr><td>Esc</td><td>Quit</td></tr>
+</tbody>
+</table>
+</div>
+<p>Mouse controls: left-drag to orbit, right-drag to pan, scroll to zoom.</p>
+<h2 id="screenshots"><a class="header" href="#screenshots">Screenshots</a></h2>
+<p>Headless screenshots of robots at their zero joint configuration, rendered
+using collision geometry primitives with per-link color gradients.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Robot</th><th>Screenshot</th></tr>
+</thead>
+<tbody>
+<tr><td>UR5e</td><td><img src="../crates/kinetic-viewer/screenshots/ur5e.png" alt="UR5e"></td></tr>
+<tr><td>Franka Panda</td><td><img src="../crates/kinetic-viewer/screenshots/franka_panda.png" alt="Franka Panda"></td></tr>
+<tr><td>KUKA iiwa14</td><td><img src="../crates/kinetic-viewer/screenshots/kuka_iiwa14.png" alt="KUKA iiwa14"></td></tr>
+<tr><td>xArm7</td><td><img src="../crates/kinetic-viewer/screenshots/xarm7.png" alt="xArm7"></td></tr>
+</tbody>
+</table>
+</div>
+<p>To regenerate screenshots:</p>
+<pre><code class="language-bash">VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/nvidia_icd.json \
+  cargo run -p kinetic-viewer --example capture_screenshots --features visual
+</code></pre>
+<h2 id="api-usage"><a class="header" href="#api-usage">API Usage</a></h2>
+<h3 id="embedding-in-custom-applications"><a class="header" href="#embedding-in-custom-applications">Embedding in Custom Applications</a></h3>
+<p>Use <code>kinetic-viewer</code> as a library to render robots in your own application:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use kinetic_viewer::{robot_scene_graph, Camera, MeshRegistry, ViewerSettings};
+use kinetic_viewer::app::{run_viewer, ViewerConfig};
+use kinetic_robot::Robot;
+
+let robot = Robot::from_name("ur5e")?;
+let camera = Camera::perspective([1.5, 1.0, 1.5], [0.0, 0.3, 0.0], 45.0);
+let config = ViewerConfig {
+    title: "My Robot Viewer".into(),
+    ..Default::default()
+};
+run_viewer(config, robot, camera)?;
+<span class="boring">}</span></code></pre>
+<h3 id="headless-rendering-screenshots-ci"><a class="header" href="#headless-rendering-screenshots-ci">Headless Rendering (Screenshots, CI)</a></h3>
+<p>Render to PNG without a window:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use kinetic_viewer::test_utils::HeadlessRenderer;
+use kinetic_viewer::{robot_scene_graph, Camera, MeshRegistry, ViewerSettings};
+use kinetic_robot::Robot;
+
+let robot = Robot::from_name("ur5e").unwrap();
+let mut meshes = MeshRegistry::new();
+let scene = robot_scene_graph(&amp;robot, &amp;mut meshes);
+let camera = Camera::perspective([1.5, 1.0, 1.5], [0.0, 0.3, 0.0], 45.0);
+let settings = ViewerSettings::default();
+
+let mut renderer = HeadlessRenderer::new(1280, 720).unwrap();
+renderer.upload_meshes(&amp;meshes);
+let pixels = renderer.render(&amp;scene, &amp;camera, &amp;settings);
+
+// Save as PNG (requires `image` crate)
+image::save_buffer(
+    "screenshot.png", &amp;pixels, 1280, 720,
+    image::ColorType::Rgba8,
+).unwrap();
+<span class="boring">}</span></code></pre>
+<h3 id="visual-regression-testing"><a class="header" href="#visual-regression-testing">Visual Regression Testing</a></h3>
+<p>Compare two renders for pixel-level differences:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use kinetic_viewer::test_utils::{compare_screenshots, diff_image};
+
+let result = compare_screenshots(&amp;actual, &amp;expected, 1280, 720, 2);
+assert!(result.rmse &lt; 5.0, "Visual regression: RMSE={}", result.rmse);
+
+// Generate a red/green diff image for inspection
+let diff = diff_image(&amp;actual, &amp;expected, 1280, 720);
+<span class="boring">}</span></code></pre>
+<h2 id="crate-features"><a class="header" href="#crate-features">Crate Features</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Feature</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>visual</code></td><td>GPU rendering, mesh loading, image export</td></tr>
+<tr><td><code>cli</code></td><td>Command-line interface (<code>--robot</code>, <code>--list-robots</code>)</td></tr>
+</tbody>
+</table>
+</div>
+<p>The <code>visual</code> feature is enabled by default. Use <code>--no-default-features</code> for
+data-model-only usage (scene graph, camera math, render commands) without GPU
+dependencies.</p>
+<h2 id="architecture-1"><a class="header" href="#architecture-1">Architecture</a></h2>
+<pre><code>kinetic-viewer
+  +-- lib.rs         Scene graph, Camera, MeshData, ViewerSettings, RenderCommand
+  +-- app.rs         Windowed viewer (winit + wgpu + egui)
+  +-- gpu_context.rs wgpu device/surface setup
+  +-- pipeline.rs    Mesh, wireframe, and line render pipelines
+  +-- gpu_buffers.rs GPU buffer management (instances, lines, uniforms)
+  +-- test_utils.rs  HeadlessRenderer + screenshot comparison
+  +-- egui_ui.rs     Joint sliders, planning panel, servo panel
+  +-- gizmo.rs       3D gizmo interaction (translate/rotate handles)
+  +-- interaction.rs Markers, selection, undo
+  +-- collision_viz.rs  Collision sphere debug overlays
+  +-- trajectory_viz.rs Trajectory playback + ghost robots
+  +-- perception_viz.rs Point cloud + voxel display
+  +-- web_export.rs  Scene export for web viewers
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h1>
 <p>Systematic diagnosis of common errors and failures. Every <code>KineticError</code>
@@ -7681,7 +8082,7 @@ criterion_main!(benches);
 <li>Report CPU model, RAM speed, OS version, and Rust version</li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="architecture-1"><a class="header" href="#architecture-1">Architecture</a></h1>
+<h1 id="architecture-2"><a class="header" href="#architecture-2">Architecture</a></h1>
 <p>Crate structure, dependency layers, and design principles.</p>
 <h2 id="crate-dependency-diagram"><a class="header" href="#crate-dependency-diagram">Crate Dependency Diagram</a></h2>
 <pre><code>                         kinetic  (top-level re-exports + prelude)

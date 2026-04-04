@@ -14,6 +14,7 @@ members = [
     "crates/kinetic-grasp",
     "crates/kinetic-gpu",
     "crates/kinetic-execution",
+    "crates/kinetic-viewer",
 ]
 exclude = [
     "crates/kinetic-python",
@@ -63,6 +64,17 @@ kiddo = "4"
 
 # Mesh loading
 stl_io = "0.7"
+
+# Windowing & UI
+winit = "0.30"
+egui = "0.31"
+egui-wgpu = "0.31"
+egui-winit = "0.31"
+pollster = "0.4"
+clap = { version = "4", features = ["derive"] }
+image = { version = "0.25", default-features = false, features = ["png"] }
+log = "0.4"
+env_logger = "0.11"
 
 # Benchmarking
 criterion = { version = "0.5", features = ["html_reports"] }
