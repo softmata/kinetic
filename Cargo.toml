@@ -25,7 +25,7 @@ exclude = [
 edition = "2021"
 rust-version = "1.75"
 license = "Apache-2.0"
-repository = "https://gitlab.com/softmata/kinetic"
+repository = "https://github.com/softmata/kinetic"
 
 [workspace.dependencies]
 # Math

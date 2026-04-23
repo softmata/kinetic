@@ -15,8 +15,8 @@ command = "mdbook-mermaid"
 additional-js = ["mermaid.min.js", "mermaid-init.js"]
 default-theme = "navy"
 preferred-dark-theme = "navy"
-git-repository-url = "https://gitlab.com/softmata/kinetic"
-edit-url-template = "https://gitlab.com/softmata/kinetic/-/edit/main/docs-site/{path}"
+git-repository-url = "https://github.com/softmata/kinetic"
+edit-url-template = "https://github.com/softmata/kinetic/edit/main/docs-site/{path}"
 site-url = "/kinetic/"
 no-section-label = false
 

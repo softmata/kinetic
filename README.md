@@ -4,7 +4,7 @@ Fast, Rust-native motion planning for robotics. Complete MoveIt2 replacement.
 
 10 IK solvers, 14 planners, SIMD collision detection, 54 built-in robots, GPU trajectory optimization, full Python bindings.
 
-**[Documentation](https://softmata.gitlab.io/kinetic/)** | **[API Cheatsheet](https://softmata.gitlab.io/kinetic/reference/api-cheatsheet.html)** | **[Python Quickstart](https://softmata.gitlab.io/kinetic/tutorials/python/quickstart.html)**
+**[Documentation](https://softmata.github.io/kinetic/)** | **[API Cheatsheet](https://softmata.github.io/kinetic/reference/api-cheatsheet.html)** | **[Python Quickstart](https://softmata.github.io/kinetic/tutorials/python/quickstart.html)**
 
 ## Quick Start
 

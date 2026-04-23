@@ -88,10 +88,10 @@ graph LR
 
 Kinetic is a planning and kinematics library, not a complete robotics framework. It does not include:
 
-- **Hardware drivers** — Use [terra](https://gitlab.com/softmata/terra) (HORUS HAL), ros2_control, or your own driver
+- **Hardware drivers** — Use [terra](https://github.com/softmata/terra) (HORUS HAL), ros2_control, or your own driver
 - **Perception / object detection** — Feed detected shapes to kinetic's Scene API
-- **Visualization** — Export trajectories to JSON/CSV, use matplotlib (Python), or connect via [horus-monitor](https://gitlab.com/softmata/horus)
-- **ROS2 middleware** — Kinetic runs standalone. For ROS2 integration, use the [horus-kinetic](https://gitlab.com/softmata/kinetic/tree/main/crates/horus-kinetic) bridge
+- **Visualization** — Export trajectories to JSON/CSV, use matplotlib (Python), or connect via [horus-monitor](https://github.com/softmata/horus)
+- **ROS2 middleware** — Kinetic runs standalone. For ROS2 integration, use the [horus-kinetic](https://github.com/softmata/kinetic/tree/main/crates/horus-kinetic) bridge
 
 ## Who Kinetic Is For
 

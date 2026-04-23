@@ -5,7 +5,7 @@ description = "HORUS bridge for KINETIC: PlannerNode, ServoNode, SceneNode"
 edition = "2021"
 rust-version = "1.75"
 license = "Apache-2.0"
-repository = "https://gitlab.com/softmata/kinetic"
+repository = "https://github.com/softmata/kinetic"
 
 [dependencies]
 kinetic-core = { path = "../kinetic-core" }

@@ -15,7 +15,7 @@ meta-tests that verify the test infrastructure itself works correctly.
 
 ## CI GATE 1: All Acceptance Tests Pass
 
-**Requirement**: GitLab CI/CD CI must run all acceptance tests on every PR.
+**Requirement**: GitHub Actions CI must run all acceptance tests on every PR.
 
 ```yaml
 # In .github/workflows/kinetic.yml, add:

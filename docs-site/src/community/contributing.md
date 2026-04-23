@@ -4,7 +4,7 @@ How to contribute code, tests, robot configs, and documentation to kinetic.
 
 ## Bug Reports
 
-File issues on the GitLab repository with:
+File issues on the GitHub repository with:
 
 1. **Kinetic version** (`cargo pkgid kinetic`)
 2. **Rust version** (`rustc --version`)
@@ -161,7 +161,7 @@ explaining why). Test code examples with `cargo test --doc`.
 
 ```bash
 # Clone
-git clone https://gitlab.com/softmata/kinetic.git
+git clone https://github.com/softmata/kinetic.git
 cd kinetic
 
 # Build

@@ -30,7 +30,7 @@ This installs a native extension built with PyO3 — no Rust toolchain needed on
 ## From Source
 
 ```bash
-git clone https://gitlab.com/softmata/kinetic.git
+git clone https://github.com/softmata/kinetic.git
 cd kinetic
 cargo build --release
 ```
