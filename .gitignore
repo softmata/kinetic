@@ -31,6 +31,9 @@ Thumbs.db
 # Coverage reports
 coverage/
 
+# mdbook build output (deployed to gh-pages branch, not main)
+docs-site/book/
+
 # Claude Code
 .claude/
 CLAUDE.md
