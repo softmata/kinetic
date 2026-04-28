@@ -262,166 +262,188 @@ impl ApplicationHandler for ViewerApp {
                 state.gpu.resize(size.width, size.height);
                 state.gpu.window.request_redraw();
             }
-
             WindowEvent::MouseInput { state: btn_state, button, .. } => {
-                if state.egui_wants_pointer { return; }
-                let pressed = btn_state == ElementState::Pressed;
-                match button {
-                    MouseButton::Left => {
-                        if pressed {
-                            state.mouse_pressed_left = true;
-                            // Try gizmo hit test on click
-                            if let Some((cx, cy)) = state.last_cursor {
-                                let ray = gizmo::screen_to_ray(
-                                    cx as f32, cy as f32,
-                                    state.gpu.width() as f32, state.gpu.height() as f32,
-                                    &self.camera, state.gpu.aspect(),
-                                );
-                                // Test against goal marker gizmo
-                                if let Some(marker) = state.interaction.markers.get("goal") {
-                                    let pos = marker.position();
-                                    let center = [pos[0] as f32, pos[1] as f32, pos[2] as f32];
-                                    if let Some(handle) = gizmo::hit_test_gizmo(&ray, center, 0.15, 0.12, 0.03) {
-                                        state.active_gizmo_handle = Some(handle);
-                                        state.prev_ray = Some(ray);
-                                    }
-                                }
-                            }
-                        } else {
-                            state.mouse_pressed_left = false;
-                            state.active_gizmo_handle = None;
-                            state.prev_ray = None;
-                        }
-                    }
-                    MouseButton::Right => state.mouse_pressed_right = pressed,
-                    MouseButton::Middle => {
-                        // Middle-click: place goal marker at click position on ground plane
-                        if pressed {
-                            if let Some((cx, cy)) = state.last_cursor {
-                                let ray = gizmo::screen_to_ray(
-                                    cx as f32, cy as f32,
-                                    state.gpu.width() as f32, state.gpu.height() as f32,
-                                    &self.camera, state.gpu.aspect(),
-                                );
-                                // Intersect ray with Y=0 ground plane
-                                if ray.direction.y.abs() > 1e-6 {
-                                    let t = -ray.origin.y / ray.direction.y;
-                                    if t > 0.0 {
-                                        let hit = ray.origin + ray.direction * t;
-                                        let pose = nalgebra::Isometry3::translation(
-                                            hit.x as f64, hit.y as f64, hit.z as f64,
-                                        );
-                                        state.interaction.set_goal_pose(pose);
-                                        state.gpu.window.request_redraw();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    _ => {}
-                }
+                handle_mouse_input(state, &self.camera, button, btn_state);
             }
-
             WindowEvent::CursorMoved { position, .. } => {
-                let new_pos = (position.x, position.y);
-                if !state.egui_wants_pointer {
-                    if state.mouse_pressed_left && state.active_gizmo_handle.is_some() {
-                        let ray = gizmo::screen_to_ray(
-                            new_pos.0 as f32, new_pos.1 as f32,
-                            state.gpu.width() as f32, state.gpu.height() as f32,
-                            &self.camera, state.gpu.aspect(),
-                        );
-                        if let (Some(handle), Some(prev)) = (state.active_gizmo_handle, state.prev_ray) {
-                            if let Some(marker) = state.interaction.markers.get("goal") {
-                                let pos = marker.position();
-                                let center = nalgebra::Point3::new(pos[0] as f32, pos[1] as f32, pos[2] as f32);
-                                let axis = handle.axis();
-                                let delta = gizmo::drag_along_axis(&ray, &prev, &center, &axis);
-                                let offset = nalgebra::Isometry3::translation(
-                                    (axis.x * delta) as f64, (axis.y * delta) as f64, (axis.z * delta) as f64,
-                                );
-                                let current = state.interaction.markers["goal"].pose;
-                                state.interaction.move_marker("goal", offset * current);
-                            }
-                        }
-                        state.prev_ray = Some(ray);
-                        state.gpu.window.request_redraw();
-                    } else if let Some(last) = state.last_cursor {
-                        let dx = (new_pos.0 - last.0) as f32;
-                        let dy = (new_pos.1 - last.1) as f32;
-                        let s = 0.005;
-                        if state.mouse_pressed_left {
-                            self.camera.orbit(-dx * s, -dy * s);
-                            state.gpu.window.request_redraw();
-                        }
-                        if state.mouse_pressed_right {
-                            let right = (self.camera.target - self.camera.position).cross(&self.camera.up).normalize() * dx * s * 0.5;
-                            let up = self.camera.up * dy * s * 0.5;
-                            self.camera.position -= right; self.camera.target -= right;
-                            self.camera.position += up; self.camera.target += up;
-                            state.gpu.window.request_redraw();
-                        }
-                    }
-                }
-                state.last_cursor = Some(new_pos);
+                handle_cursor_moved(state, &mut self.camera, position);
             }
-
             WindowEvent::MouseWheel { delta, .. } => {
-                if !state.egui_wants_pointer {
-                    let scroll = match delta {
-                        MouseScrollDelta::LineDelta(_, y) => y * 0.1,
-                        MouseScrollDelta::PixelDelta(p) => p.y as f32 * 0.002,
-                    };
-                    self.camera.zoom(scroll);
-                    state.gpu.window.request_redraw();
-                }
+                handle_mouse_wheel(state, &mut self.camera, delta);
             }
-
             WindowEvent::KeyboardInput { event, .. }
                 if event.state == ElementState::Pressed && !state.egui_wants_keyboard =>
             {
-                use winit::keyboard::{Key, NamedKey};
-                match event.logical_key {
-                    Key::Character(ref c) => match c.as_str() {
-                        "g" => state.settings.show_grid = !state.settings.show_grid,
-                        "a" => state.settings.show_axes = !state.settings.show_axes,
-                        "t" => state.settings.show_trajectory_trail = !state.settings.show_trajectory_trail,
-                        "c" => state.ui.show_collision_debug = !state.ui.show_collision_debug,
-                        "v" => state.settings.show_voxels = !state.settings.show_voxels,
-                        "w" => state.settings.show_collision_wireframe = !state.settings.show_collision_wireframe,
-                        "p" => state.settings.show_point_cloud = !state.settings.show_point_cloud,
-                        "r" => self.camera = Camera::perspective([2.0, 1.5, 2.0], [0.0, 0.3, 0.0], 45.0),
-                        " " => {
-                            if let Some(player) = &mut state.trajectory_viz.player {
-                                if player.is_playing() { player.pause(); } else { player.play(); }
-                            }
-                        }
-                        "z" => { state.interaction.undo(); }
-                        "f" => {
-                            // Focus camera on goal marker if one exists
-                            if let Some(marker) = state.interaction.markers.get("goal") {
-                                let pos = marker.position();
-                                self.camera.target = nalgebra::Point3::new(
-                                    pos[0] as f32, pos[1] as f32, pos[2] as f32,
-                                );
-                            }
-                        }
-                        _ => {}
-                    },
-                    Key::Named(NamedKey::Escape) => event_loop.exit(),
-                    Key::Named(NamedKey::F1) => state.ui.show_shortcuts = !state.ui.show_shortcuts,
-                    Key::Named(NamedKey::F3) => state.ui.show_stats = !state.ui.show_stats,
-                    _ => {}
-                }
+                handle_keyboard(state, &mut self.camera, event_loop, event);
                 state.gpu.window.request_redraw();
             }
-
             WindowEvent::RedrawRequested => {
                 render_frame(state, &self.camera, &self.robot);
                 state.gpu.window.request_redraw();
             }
             _ => {}
         }
+    }
+}
+
+/// Mouse-button event: gizmo hit-test on left, pan toggle on right, ground-plane goal placement on middle.
+fn handle_mouse_input(
+    state: &mut GpuState,
+    camera: &Camera,
+    button: MouseButton,
+    btn_state: ElementState,
+) {
+    if state.egui_wants_pointer { return }
+    let pressed = btn_state == ElementState::Pressed;
+    match button {
+        MouseButton::Left => {
+            if pressed {
+                state.mouse_pressed_left = true;
+                // Try gizmo hit test on click
+                if let Some((cx, cy)) = state.last_cursor {
+                    let ray = gizmo::screen_to_ray(
+                        cx as f32, cy as f32,
+                        state.gpu.width() as f32, state.gpu.height() as f32,
+                        camera, state.gpu.aspect(),
+                    );
+                    if let Some(marker) = state.interaction.markers.get("goal") {
+                        let pos = marker.position();
+                        let center = [pos[0] as f32, pos[1] as f32, pos[2] as f32];
+                        if let Some(handle) = gizmo::hit_test_gizmo(&ray, center, 0.15, 0.12, 0.03) {
+                            state.active_gizmo_handle = Some(handle);
+                            state.prev_ray = Some(ray);
+                        }
+                    }
+                }
+            } else {
+                state.mouse_pressed_left = false;
+                state.active_gizmo_handle = None;
+                state.prev_ray = None;
+            }
+        }
+        MouseButton::Right => state.mouse_pressed_right = pressed,
+        MouseButton::Middle => {
+            // Middle-click: place goal marker at click position on ground plane
+            if !pressed { return }
+            let Some((cx, cy)) = state.last_cursor else { return };
+            let ray = gizmo::screen_to_ray(
+                cx as f32, cy as f32,
+                state.gpu.width() as f32, state.gpu.height() as f32,
+                camera, state.gpu.aspect(),
+            );
+            if ray.direction.y.abs() <= 1e-6 { return }
+            let t = -ray.origin.y / ray.direction.y;
+            if t <= 0.0 { return }
+            let hit = ray.origin + ray.direction * t;
+            let pose = nalgebra::Isometry3::translation(
+                hit.x as f64, hit.y as f64, hit.z as f64,
+            );
+            state.interaction.set_goal_pose(pose);
+            state.gpu.window.request_redraw();
+        }
+        _ => {}
+    }
+}
+
+/// Cursor move: gizmo drag if active, otherwise camera orbit (LMB) or pan (RMB).
+fn handle_cursor_moved(
+    state: &mut GpuState,
+    camera: &mut Camera,
+    position: winit::dpi::PhysicalPosition<f64>,
+) {
+    let new_pos = (position.x, position.y);
+    if !state.egui_wants_pointer {
+        if state.mouse_pressed_left && state.active_gizmo_handle.is_some() {
+            let ray = gizmo::screen_to_ray(
+                new_pos.0 as f32, new_pos.1 as f32,
+                state.gpu.width() as f32, state.gpu.height() as f32,
+                camera, state.gpu.aspect(),
+            );
+            if let (Some(handle), Some(prev)) = (state.active_gizmo_handle, state.prev_ray) {
+                if let Some(marker) = state.interaction.markers.get("goal") {
+                    let pos = marker.position();
+                    let center = nalgebra::Point3::new(pos[0] as f32, pos[1] as f32, pos[2] as f32);
+                    let axis = handle.axis();
+                    let delta = gizmo::drag_along_axis(&ray, &prev, &center, &axis);
+                    let offset = nalgebra::Isometry3::translation(
+                        (axis.x * delta) as f64, (axis.y * delta) as f64, (axis.z * delta) as f64,
+                    );
+                    let current = state.interaction.markers["goal"].pose;
+                    state.interaction.move_marker("goal", offset * current);
+                }
+            }
+            state.prev_ray = Some(ray);
+            state.gpu.window.request_redraw();
+        } else if let Some(last) = state.last_cursor {
+            let dx = (new_pos.0 - last.0) as f32;
+            let dy = (new_pos.1 - last.1) as f32;
+            let s = 0.005;
+            if state.mouse_pressed_left {
+                camera.orbit(-dx * s, -dy * s);
+                state.gpu.window.request_redraw();
+            }
+            if state.mouse_pressed_right {
+                let right = (camera.target - camera.position).cross(&camera.up).normalize() * dx * s * 0.5;
+                let up = camera.up * dy * s * 0.5;
+                camera.position -= right; camera.target -= right;
+                camera.position += up; camera.target += up;
+                state.gpu.window.request_redraw();
+            }
+        }
+    }
+    state.last_cursor = Some(new_pos);
+}
+
+/// Mouse wheel: camera zoom (line or pixel delta).
+fn handle_mouse_wheel(state: &mut GpuState, camera: &mut Camera, delta: MouseScrollDelta) {
+    if state.egui_wants_pointer { return }
+    let scroll = match delta {
+        MouseScrollDelta::LineDelta(_, y) => y * 0.1,
+        MouseScrollDelta::PixelDelta(p) => p.y as f32 * 0.002,
+    };
+    camera.zoom(scroll);
+    state.gpu.window.request_redraw();
+}
+
+/// Keyboard dispatch: toggle ViewerSettings / play-pause / undo / focus / camera reset / Esc-exit / F1 / F3.
+fn handle_keyboard(
+    state: &mut GpuState,
+    camera: &mut Camera,
+    event_loop: &ActiveEventLoop,
+    event: winit::event::KeyEvent,
+) {
+    use winit::keyboard::{Key, NamedKey};
+    match event.logical_key {
+        Key::Character(ref c) => match c.as_str() {
+            "g" => state.settings.show_grid = !state.settings.show_grid,
+            "a" => state.settings.show_axes = !state.settings.show_axes,
+            "t" => state.settings.show_trajectory_trail = !state.settings.show_trajectory_trail,
+            "c" => state.ui.show_collision_debug = !state.ui.show_collision_debug,
+            "v" => state.settings.show_voxels = !state.settings.show_voxels,
+            "w" => state.settings.show_collision_wireframe = !state.settings.show_collision_wireframe,
+            "p" => state.settings.show_point_cloud = !state.settings.show_point_cloud,
+            "r" => *camera = Camera::perspective([2.0, 1.5, 2.0], [0.0, 0.3, 0.0], 45.0),
+            " " => {
+                if let Some(player) = &mut state.trajectory_viz.player {
+                    if player.is_playing() { player.pause(); } else { player.play(); }
+                }
+            }
+            "z" => { state.interaction.undo(); }
+            "f" => {
+                // Focus camera on goal marker if one exists
+                if let Some(marker) = state.interaction.markers.get("goal") {
+                    let pos = marker.position();
+                    camera.target = nalgebra::Point3::new(
+                        pos[0] as f32, pos[1] as f32, pos[2] as f32,
+                    );
+                }
+            }
+            _ => {}
+        },
+        Key::Named(NamedKey::Escape) => event_loop.exit(),
+        Key::Named(NamedKey::F1) => state.ui.show_shortcuts = !state.ui.show_shortcuts,
+        Key::Named(NamedKey::F3) => state.ui.show_stats = !state.ui.show_stats,
+        _ => {}
     }
 }
 
