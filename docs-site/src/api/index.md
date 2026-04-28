@@ -64,7 +64,7 @@ pip install kinetic
 import kinetic
 
 # Robot & Kinematics
-kinetic.Robot(name)                          # Load robot (54 built-in configs)
+kinetic.Robot(name)                          # Load robot (52 built-in configs)
 robot.fk(joints)                             # Forward kinematics → 4x4
 robot.ik(target_4x4)                         # Inverse kinematics → joints
 robot.ik_config(target, solver="opw", ...)   # IK with full config

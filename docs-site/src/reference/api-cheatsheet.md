@@ -143,8 +143,11 @@ scene.attach("tool", kinetic.Shape.sphere(0.02), grasp_tf, "tool0")
 
 ```rust
 // Rust
+use std::sync::Arc;
 use kinetic::reactive::{Servo, ServoConfig};
-let servo = Servo::new(&robot, &scene, ServoConfig::teleop());
+let robot = Arc::new(robot);
+let scene = Arc::new(scene);
+let servo = Servo::new(&robot, &scene, ServoConfig::teleop())?;
 let cmd = servo.send_twist(&twist)?;
 // cmd.positions, cmd.velocities
 ```

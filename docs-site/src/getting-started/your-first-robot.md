@@ -132,7 +132,7 @@ See the [Custom Robots](../guides/custom-robots.md) guide for creating a full ki
 
 ## Available Robots
 
-See the [Supported Robots](../reference/supported-robots.md) reference for the complete list of 54 built-in robots with manufacturer, DOF, and IK solver.
+See the [Supported Robots](../reference/supported-robots.md) reference for the complete list of 52 built-in robots with manufacturer, DOF, and IK solver.
 
 A quick sample:
 

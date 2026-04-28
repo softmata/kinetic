@@ -44,7 +44,7 @@ That's it. No launch files, no YAML configuration, no parameter server. Load a r
 graph LR
     subgraph Foundation
         Core[kinetic-core<br/>Pose, Goal, Trajectory]
-        Robot[kinetic-robot<br/>URDF, 54 robots]
+        Robot[kinetic-robot<br/>URDF, 52 robots]
     end
 
     subgraph Physics

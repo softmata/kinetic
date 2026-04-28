@@ -2,7 +2,7 @@
 
 Fast, Rust-native motion planning for robotics. Complete MoveIt2 replacement.
 
-10 IK solvers, 14 planners, SIMD collision detection, 54 built-in robots, GPU trajectory optimization, full Python bindings.
+10 IK solvers, 14 planners, SIMD collision detection, 52 built-in robots, GPU trajectory optimization, full Python bindings.
 
 **[Documentation](https://softmata.github.io/kinetic/)** | **[API Cheatsheet](https://softmata.github.io/kinetic/reference/api-cheatsheet.html)** | **[Python Quickstart](https://softmata.github.io/kinetic/tutorials/python/quickstart.html)**
 
@@ -63,7 +63,7 @@ Run benchmarks: `cargo bench -p kinetic`
 
 **Python** -- Full PyO3 + numpy bindings, 22 classes, type stubs for IDE autocomplete
 
-**54 Robots** -- UR, Franka, KUKA, ABB, Fanuc, Kinova, xArm, and 47 more
+**52 Robots** -- UR, Franka, KUKA, ABB, Fanuc, Kinova, xArm, and 45 more
 
 ## Crate Architecture
 

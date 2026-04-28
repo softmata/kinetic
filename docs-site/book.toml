@@ -1,7 +1,7 @@
 [book]
 title = "Kinetic — Motion Planning for Robotics"
 authors = ["Softmata"]
-description = "Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 54 robots, GPU optimization."
+description = "Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 52 robots, GPU optimization."
 language = "en"
 src = "src"
 

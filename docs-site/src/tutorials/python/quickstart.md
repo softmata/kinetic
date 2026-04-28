@@ -22,7 +22,7 @@ All functions that accept or return arrays use `numpy.ndarray`.
 
 ## Load a robot
 
-kinetic ships 54 built-in robots. Load one by name:
+kinetic ships 52 built-in robots. Load one by name:
 
 ```python
 robot = kinetic.Robot("ur5e")
@@ -122,7 +122,7 @@ planner = kinetic.Planner(robot)
 traj = planner.plan(start, goal)
 ```
 
-Choose from 9 planner algorithms:
+Choose from 8 planner algorithms:
 
 ```python
 planner = kinetic.Planner(robot, planner_type="rrt_star")  # asymptotically optimal

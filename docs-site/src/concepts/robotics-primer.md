@@ -192,7 +192,7 @@ How does kinetic know what a UR5e looks like? From a **URDF file**
 link's shape, every joint's type and limits, and how they connect. Think
 of it as a blueprint.
 
-Kinetic ships 54 built-in robots so you don't need to write URDF files.
+Kinetic ships 52 built-in robots so you don't need to write URDF files.
 Just say `Robot("ur5e")` and it loads everything.
 
 ## Putting it all together
