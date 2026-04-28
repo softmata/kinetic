@@ -210,14 +210,7 @@ impl GpuOptimizer {
         let num_seeds = self.config.num_seeds as usize;
         let timesteps = self.config.timesteps as usize;
 
-        if start.len() != dof || goal.len() != dof {
-            return Err(GpuError::InvalidConfig(format!(
-                "start/goal length ({}/{}) doesn't match robot DOF ({})",
-                start.len(),
-                goal.len(),
-                dof
-            )));
-        }
+        validate_dimensions(start, goal, dof)?;
 
         // --- Prepare robot data for GPU ---
         let (joint_origins, joint_axes, joint_types, local_spheres, num_gpu_joints) =
@@ -464,36 +457,17 @@ impl GpuOptimizer {
         // --- Optimization loop ---
         let fk_workgroups = ((num_seeds * timesteps * num_spheres) as u32).div_ceil(64);
         let opt_workgroups = self.config.num_seeds; // workgroup_size(1) in optimizer
-
-        for _ in 0..self.config.iterations {
-            let mut encoder = self
-                .device
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
-
-            // FK pass: joint values → world-frame sphere positions
-            {
-                let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                    label: Some("fk_pass"),
-                    ..Default::default()
-                });
-                pass.set_pipeline(&fk_pipeline);
-                pass.set_bind_group(0, &fk_bind_group, &[]);
-                pass.dispatch_workgroups(fk_workgroups, 1, 1);
-            }
-
-            // Optimization pass: compute costs + gradient descent step
-            {
-                let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
-                    label: Some("opt_pass"),
-                    ..Default::default()
-                });
-                pass.set_pipeline(&opt_pipeline);
-                pass.set_bind_group(0, &opt_bind_group, &[]);
-                pass.dispatch_workgroups(opt_workgroups, 1, 1);
-            }
-
-            self.queue.submit([encoder.finish()]);
-        }
+        dispatch_optimization_iterations(
+            &self.device,
+            &self.queue,
+            &fk_pipeline,
+            &fk_bind_group,
+            &opt_pipeline,
+            &opt_bind_group,
+            fk_workgroups,
+            opt_workgroups,
+            self.config.iterations,
+        );
 
         // --- Read back results ---
         let traj_size = (num_seeds * timesteps * dof * std::mem::size_of::<f32>()) as u64;
@@ -520,23 +494,7 @@ impl GpuOptimizer {
         let costs = read_buffer_f32(&self.device, &costs_staging, num_seeds)?;
         let trajs = read_buffer_f32(&self.device, &traj_staging, num_seeds * timesteps * dof)?;
 
-        // Find best seed (lowest cost)
-        let best_seed = costs
-            .iter()
-            .enumerate()
-            .min_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
-            .map(|(i, _)| i)
-            .unwrap_or(0);
-
-        // Extract best trajectory and convert to kinetic Trajectory
-        let mut traj = Trajectory::with_dof(dof);
-        for t in 0..timesteps {
-            let base = best_seed * timesteps * dof + t * dof;
-            let wp: Vec<f64> = (0..dof).map(|j| trajs[base + j] as f64).collect();
-            traj.push_waypoint(&wp);
-        }
-
-        Ok(traj)
+        Ok(extract_best_trajectory(&costs, &trajs, timesteps, dof))
     }
 
     /// Optimize a trajectory using obstacles from a planning scene.
@@ -619,6 +577,80 @@ impl GpuOptimizer {
                 cache: None,
             })
     }
+}
+
+/// Reject mismatched start/goal/DOF before any GPU work.
+fn validate_dimensions(start: &[f64], goal: &[f64], dof: usize) -> Result<()> {
+    if start.len() != dof || goal.len() != dof {
+        return Err(GpuError::InvalidConfig(format!(
+            "start/goal length ({}/{}) doesn't match robot DOF ({})",
+            start.len(),
+            goal.len(),
+            dof
+        )));
+    }
+    Ok(())
+}
+
+/// Run the FK + optimization compute passes for `iterations` rounds.
+#[allow(clippy::too_many_arguments)]
+fn dispatch_optimization_iterations(
+    device: &wgpu::Device,
+    queue: &wgpu::Queue,
+    fk_pipeline: &wgpu::ComputePipeline,
+    fk_bind_group: &wgpu::BindGroup,
+    opt_pipeline: &wgpu::ComputePipeline,
+    opt_bind_group: &wgpu::BindGroup,
+    fk_workgroups: u32,
+    opt_workgroups: u32,
+    iterations: u32,
+) {
+    for _ in 0..iterations {
+        let mut encoder =
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
+
+        // FK pass: joint values → world-frame sphere positions
+        {
+            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+                label: Some("fk_pass"),
+                ..Default::default()
+            });
+            pass.set_pipeline(fk_pipeline);
+            pass.set_bind_group(0, fk_bind_group, &[]);
+            pass.dispatch_workgroups(fk_workgroups, 1, 1);
+        }
+
+        // Optimization pass: compute costs + gradient descent step
+        {
+            let mut pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+                label: Some("opt_pass"),
+                ..Default::default()
+            });
+            pass.set_pipeline(opt_pipeline);
+            pass.set_bind_group(0, opt_bind_group, &[]);
+            pass.dispatch_workgroups(opt_workgroups, 1, 1);
+        }
+
+        queue.submit([encoder.finish()]);
+    }
+}
+
+/// Find the seed with the lowest cost and convert its trajectory to kinetic-core `Trajectory`.
+fn extract_best_trajectory(costs: &[f32], trajs: &[f32], timesteps: usize, dof: usize) -> Trajectory {
+    let best_seed = costs
+        .iter()
+        .enumerate()
+        .min_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+        .map(|(i, _)| i)
+        .unwrap_or(0);
+
+    let mut traj = Trajectory::with_dof(dof);
+    for t in 0..timesteps {
+        let base = best_seed * timesteps * dof + t * dof;
+        let wp: Vec<f64> = (0..dof).map(|j| trajs[base + j] as f64).collect();
+        traj.push_waypoint(&wp);
+    }
+    traj
 }
 
 /// Create a storage buffer, using a 4-byte placeholder when data is empty
