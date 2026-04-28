@@ -9,7 +9,7 @@
 
         <!-- Custom HTML head -->
 
-        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 52 robots, GPU optimization.">
+        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners (8 in Python), SIMD collision, 52 robots, GPU optimization.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e21be642.js";
+            window.path_to_searchindex_js = "searchindex-2e14c9ea.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-2f1c048c.js"></script>
@@ -7112,7 +7112,7 @@ PyBullet’s IK and motion planning functionality.</p>
 </table>
 </div>
 <p><strong>Key difference:</strong> PyBullet is a simulator with basic IK (damped least squares).
-Kinetic is a planning stack with 10 IK solvers, 14 planners, and GPU optimization.
+Kinetic is a planning stack with 10 IK solvers, 14 planners (8 surfaced in Python), and GPU optimization.
 PyBullet runs in Python; kinetic’s core is Rust with Python bindings.</p>
 <p><strong>Comparison:</strong></p>
 <pre><code class="language-python"># PyBullet
@@ -7174,7 +7174,7 @@ pose = planner.fk(q)
 <tbody>
 <tr><td>Language</td><td>Rust</td><td>C++</td><td>Python</td><td>C++</td><td>C++</td><td>Python</td><td>C++</td></tr>
 <tr><td>FK/IK</td><td>Built-in</td><td>Plugin</td><td>Built-in</td><td>Built-in</td><td>External</td><td>Basic</td><td>Built-in</td></tr>
-<tr><td>Planning</td><td>14 planners</td><td>OMPL</td><td>Optimizer</td><td>GCS/Opt</td><td>Planners</td><td>None</td><td>None</td></tr>
+<tr><td>Planning</td><td>14 (8 in Py)</td><td>OMPL</td><td>Optimizer</td><td>GCS/Opt</td><td>Planners</td><td>None</td><td>None</td></tr>
 <tr><td>Collision</td><td>SIMD spheres</td><td>FCL</td><td>CUDA SDF</td><td>Drake</td><td>External</td><td>Bullet</td><td>HPP-FCL</td></tr>
 <tr><td>GPU</td><td>wgpu</td><td>No</td><td>CUDA</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
 <tr><td>Dynamics</td><td>No</td><td>No</td><td>No</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr>
