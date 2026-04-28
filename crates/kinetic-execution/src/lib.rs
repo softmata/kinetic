@@ -26,6 +26,7 @@
 //! ```
 
 pub mod controller;
+mod controller_types;
 pub mod log;
 pub mod realtime;
 pub mod sim;
