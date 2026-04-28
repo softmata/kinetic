@@ -20,6 +20,7 @@ pub mod acm;
 pub mod capt;
 pub mod ccd;
 pub mod check;
+mod convex_backend;
 pub mod lod;
 pub mod mesh;
 pub mod sdf;
