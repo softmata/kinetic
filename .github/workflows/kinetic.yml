@@ -3,18 +3,12 @@ name: KINETIC CI
 on:
   push:
     branches: [main]
-    paths: ['kinetic/**']
   pull_request:
     branches: [main]
-    paths: ['kinetic/**']
 
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: -D warnings
-
-defaults:
-  run:
-    working-directory: kinetic
 
 jobs:
   check:
@@ -26,8 +20,6 @@ jobs:
         with:
           components: clippy, rustfmt
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kinetic
 
       - name: Check formatting
         run: cargo fmt --all --check
@@ -48,8 +40,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kinetic
 
       - name: Run tests
         run: cargo test --workspace
@@ -61,8 +51,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kinetic
 
       - name: Install tarpaulin
         run: cargo install cargo-tarpaulin
@@ -89,7 +77,7 @@ jobs:
         if: always()
         with:
           name: coverage-report
-          path: kinetic/tarpaulin-report.html
+          path: tarpaulin-report.html
 
   acceptance:
     name: Acceptance Tests
@@ -99,8 +87,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kinetic
 
       - name: Run acceptance tests
         run: cargo test -p kinetic --test "test_0*" --test "test_1*" --test "test_critical*"
@@ -138,8 +124,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kinetic
 
       - name: Run benchmarks (report only)
         run: cargo bench -p kinetic --no-fail-fast 2>&1 | tee bench-output.txt
@@ -148,7 +132,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: kinetic/target/criterion/
+          path: target/criterion/
 
   doc:
     name: Documentation
@@ -157,8 +141,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kinetic
 
       - name: Build docs
         run: cargo doc --no-deps --all-features
