@@ -20,7 +20,7 @@
 //! }
 //! ```
 
-use crate::trapezoidal::TimedTrajectory;
+use crate::trapezoidal::{TimedTrajectory, TimedWaypoint};
 
 /// Type of trajectory violation detected.
 #[derive(Debug, Clone, PartialEq)]
@@ -139,15 +139,10 @@ impl TrajectoryValidator {
         }
 
         if traj.waypoints.is_empty() {
-            if violations.is_empty() {
-                return Ok(());
-            } else {
-                return Err(violations);
-            }
+            return if violations.is_empty() { Ok(()) } else { Err(violations) };
         }
 
         let dof = traj.dof;
-        let sf = self.config.safety_factor;
 
         for (i, wp) in traj.waypoints.iter().enumerate() {
             // Skip if dimensions don't match (already flagged above)
@@ -155,123 +150,12 @@ impl TrajectoryValidator {
                 continue;
             }
 
-            for j in 0..dof.min(self.dof()) {
-                // Position limit check
-                if wp.positions[j] < self.position_lower[j] - 1e-6
-                    || wp.positions[j] > self.position_upper[j] + 1e-6
-                {
-                    let limit = if wp.positions[j] < self.position_lower[j] {
-                        self.position_lower[j]
-                    } else {
-                        self.position_upper[j]
-                    };
-                    violations.push(TrajectoryViolation {
-                        waypoint_index: i,
-                        joint_index: j,
-                        violation_type: ViolationType::PositionLimit,
-                        actual_value: wp.positions[j],
-                        limit_value: limit,
-                    });
-                }
+            self.check_static_limits(i, wp, dof, &mut violations);
 
-                // Velocity limit check
-                if j < self.velocity_limits.len()
-                    && self.velocity_limits[j] > 0.0
-                    && wp.velocities.len() > j
-                    && wp.velocities[j].abs() > self.velocity_limits[j] * sf
-                {
-                    violations.push(TrajectoryViolation {
-                        waypoint_index: i,
-                        joint_index: j,
-                        violation_type: ViolationType::VelocityLimit,
-                        actual_value: wp.velocities[j].abs(),
-                        limit_value: self.velocity_limits[j],
-                    });
-                }
-
-                // Acceleration limit check
-                if j < self.acceleration_limits.len()
-                    && self.acceleration_limits[j] > 0.0
-                    && wp.accelerations.len() > j
-                    && wp.accelerations[j].abs() > self.acceleration_limits[j] * sf
-                {
-                    violations.push(TrajectoryViolation {
-                        waypoint_index: i,
-                        joint_index: j,
-                        violation_type: ViolationType::AccelerationLimit,
-                        actual_value: wp.accelerations[j].abs(),
-                        limit_value: self.acceleration_limits[j],
-                    });
-                }
-            }
-
-            // Position jump check (between consecutive waypoints)
-            // Time-aware: scale the allowed jump by the time step so sparse
-            // trajectories (large dt between waypoints) aren't falsely flagged.
             if i > 0 {
                 let prev = &traj.waypoints[i - 1];
                 if prev.positions.len() == dof {
-                    let dt = wp.time - prev.time;
-                    // Scale factor: allow proportionally larger jumps for larger time steps.
-                    // Reference dt = 0.01s (100 Hz sampling). At dt=1.0s, allow 100x the jump.
-                    let dt_scale = if dt > 1e-12 {
-                        (dt / 0.01).max(1.0)
-                    } else {
-                        1.0
-                    };
-                    let scaled_limit = self.config.max_position_jump * dt_scale;
-                    for j in 0..dof.min(self.dof()) {
-                        let jump = (wp.positions[j] - prev.positions[j]).abs();
-                        if jump > scaled_limit {
-                            violations.push(TrajectoryViolation {
-                                waypoint_index: i,
-                                joint_index: j,
-                                violation_type: ViolationType::PositionJump,
-                                actual_value: jump,
-                                limit_value: scaled_limit,
-                            });
-                        }
-                    }
-
-                    // Velocity discontinuity check: |dv| / dt should be <= accel limit
-                    let dt = wp.time - prev.time;
-                    if dt > 1e-12 {
-                        for j in 0..dof.min(self.dof()) {
-                            if wp.velocities.len() > j && prev.velocities.len() > j {
-                                let dv = (wp.velocities[j] - prev.velocities[j]).abs();
-                                let implied_accel = dv / dt;
-                                if j < self.acceleration_limits.len()
-                                    && self.acceleration_limits[j] > 0.0
-                                    && implied_accel > self.acceleration_limits[j] * sf * 2.0
-                                {
-                                    violations.push(TrajectoryViolation {
-                                        waypoint_index: i,
-                                        joint_index: j,
-                                        violation_type: ViolationType::VelocityDiscontinuity,
-                                        actual_value: implied_accel,
-                                        limit_value: self.acceleration_limits[j],
-                                    });
-                                }
-                            }
-
-                            // Jerk check: |da| / dt
-                            if let Some(max_jerk) = self.config.max_jerk {
-                                if wp.accelerations.len() > j && prev.accelerations.len() > j {
-                                    let da = (wp.accelerations[j] - prev.accelerations[j]).abs();
-                                    let implied_jerk = da / dt;
-                                    if implied_jerk > max_jerk * sf {
-                                        violations.push(TrajectoryViolation {
-                                            waypoint_index: i,
-                                            joint_index: j,
-                                            violation_type: ViolationType::JerkLimit,
-                                            actual_value: implied_jerk,
-                                            limit_value: max_jerk,
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    self.check_transitions(i, prev, wp, dof, &mut violations);
                 }
             }
         }
@@ -280,6 +164,143 @@ impl TrajectoryValidator {
             Ok(())
         } else {
             Err(violations)
+        }
+    }
+
+    /// Static per-waypoint checks: position / velocity / acceleration limits.
+    fn check_static_limits(
+        &self,
+        i: usize,
+        wp: &TimedWaypoint,
+        dof: usize,
+        violations: &mut Vec<TrajectoryViolation>,
+    ) {
+        let sf = self.config.safety_factor;
+        for j in 0..dof.min(self.dof()) {
+            // Position limit
+            if wp.positions[j] < self.position_lower[j] - 1e-6
+                || wp.positions[j] > self.position_upper[j] + 1e-6
+            {
+                let limit = if wp.positions[j] < self.position_lower[j] {
+                    self.position_lower[j]
+                } else {
+                    self.position_upper[j]
+                };
+                violations.push(TrajectoryViolation {
+                    waypoint_index: i,
+                    joint_index: j,
+                    violation_type: ViolationType::PositionLimit,
+                    actual_value: wp.positions[j],
+                    limit_value: limit,
+                });
+            }
+
+            // Velocity limit
+            if j < self.velocity_limits.len()
+                && self.velocity_limits[j] > 0.0
+                && wp.velocities.len() > j
+                && wp.velocities[j].abs() > self.velocity_limits[j] * sf
+            {
+                violations.push(TrajectoryViolation {
+                    waypoint_index: i,
+                    joint_index: j,
+                    violation_type: ViolationType::VelocityLimit,
+                    actual_value: wp.velocities[j].abs(),
+                    limit_value: self.velocity_limits[j],
+                });
+            }
+
+            // Acceleration limit
+            if j < self.acceleration_limits.len()
+                && self.acceleration_limits[j] > 0.0
+                && wp.accelerations.len() > j
+                && wp.accelerations[j].abs() > self.acceleration_limits[j] * sf
+            {
+                violations.push(TrajectoryViolation {
+                    waypoint_index: i,
+                    joint_index: j,
+                    violation_type: ViolationType::AccelerationLimit,
+                    actual_value: wp.accelerations[j].abs(),
+                    limit_value: self.acceleration_limits[j],
+                });
+            }
+        }
+    }
+
+    /// Transition checks between consecutive waypoints: position jump,
+    /// velocity discontinuity, jerk limit. Time-scaled for sparse trajectories.
+    fn check_transitions(
+        &self,
+        i: usize,
+        prev: &TimedWaypoint,
+        wp: &TimedWaypoint,
+        dof: usize,
+        violations: &mut Vec<TrajectoryViolation>,
+    ) {
+        let sf = self.config.safety_factor;
+        let dt = wp.time - prev.time;
+        // Scale factor: allow proportionally larger jumps for larger time steps.
+        // Reference dt = 0.01s (100 Hz sampling). At dt=1.0s, allow 100x the jump.
+        let dt_scale = if dt > 1e-12 {
+            (dt / 0.01).max(1.0)
+        } else {
+            1.0
+        };
+        let scaled_jump_limit = self.config.max_position_jump * dt_scale;
+
+        for j in 0..dof.min(self.dof()) {
+            // Position jump
+            let jump = (wp.positions[j] - prev.positions[j]).abs();
+            if jump > scaled_jump_limit {
+                violations.push(TrajectoryViolation {
+                    waypoint_index: i,
+                    joint_index: j,
+                    violation_type: ViolationType::PositionJump,
+                    actual_value: jump,
+                    limit_value: scaled_jump_limit,
+                });
+            }
+        }
+
+        if dt <= 1e-12 {
+            return;
+        }
+
+        for j in 0..dof.min(self.dof()) {
+            // Velocity discontinuity: |dv|/dt should be <= 2 × accel limit
+            if wp.velocities.len() > j && prev.velocities.len() > j {
+                let dv = (wp.velocities[j] - prev.velocities[j]).abs();
+                let implied_accel = dv / dt;
+                if j < self.acceleration_limits.len()
+                    && self.acceleration_limits[j] > 0.0
+                    && implied_accel > self.acceleration_limits[j] * sf * 2.0
+                {
+                    violations.push(TrajectoryViolation {
+                        waypoint_index: i,
+                        joint_index: j,
+                        violation_type: ViolationType::VelocityDiscontinuity,
+                        actual_value: implied_accel,
+                        limit_value: self.acceleration_limits[j],
+                    });
+                }
+            }
+
+            // Jerk: |da|/dt
+            if let Some(max_jerk) = self.config.max_jerk {
+                if wp.accelerations.len() > j && prev.accelerations.len() > j {
+                    let da = (wp.accelerations[j] - prev.accelerations[j]).abs();
+                    let implied_jerk = da / dt;
+                    if implied_jerk > max_jerk * sf {
+                        violations.push(TrajectoryViolation {
+                            waypoint_index: i,
+                            joint_index: j,
+                            violation_type: ViolationType::JerkLimit,
+                            actual_value: implied_jerk,
+                            limit_value: max_jerk,
+                        });
+                    }
+                }
+            }
         }
     }
 }
