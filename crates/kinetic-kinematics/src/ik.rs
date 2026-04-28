@@ -221,157 +221,32 @@ pub fn solve_ik(
     target: &Pose,
     config: &IKConfig,
 ) -> Result<IKSolution> {
-    // Auto-select solver based on robot config preference, DOF, and geometry
-    let effective_solver = match &config.solver {
-        IKSolver::Auto => {
-            // Check robot config's IK preference first
-            let preferred = robot
-                .ik_preference
-                .as_ref()
-                .map(|p| p.solver.as_str())
-                .unwrap_or("auto");
+    let effective_solver = select_effective_solver(robot, chain, config);
+    let restart_solver = restart_solver_for(&effective_solver);
 
-            match preferred {
-                "opw" if opw::is_opw_compatible(robot, chain) => IKSolver::OPW,
-                "subproblem" if subproblem::is_subproblem_compatible(robot, chain) => {
-                    IKSolver::Subproblem
-                }
-                "subproblem7dof" if subproblem::is_subproblem_7dof_compatible(robot, chain) => {
-                    IKSolver::Subproblem7DOF { num_samples: 36 }
-                }
-                "fabrik" => IKSolver::FABRIK,
-                "dls" => IKSolver::DLS { damping: 0.05 },
-                // "auto" or preference didn't validate — use geometry-based selection
-                _ => {
-                    if opw::is_opw_compatible(robot, chain) {
-                        IKSolver::OPW
-                    } else if subproblem::is_subproblem_compatible(robot, chain) {
-                        IKSolver::Subproblem
-                    } else if subproblem::is_subproblem_7dof_compatible(robot, chain) {
-                        IKSolver::Subproblem7DOF { num_samples: 36 }
-                    } else {
-                        IKSolver::DLS { damping: 0.05 }
-                    }
-                }
-            }
-        }
-        other => other.clone(),
-    };
-
-    // Get initial seed
     let initial_seed = config
         .seed
         .clone()
         .unwrap_or_else(|| robot.mid_configuration().to_vec());
-
-    // Extract chain-local seed
     let seed = chain.extract_joint_values(&initial_seed);
 
-    // Determine the effective mode for this solve
+    // PositionFallback first tries Full6D; if it fails we'll retry as PositionOnly below.
     let effective_mode = match config.mode {
-        IKMode::PositionFallback => IKMode::Full6D, // try full first
+        IKMode::PositionFallback => IKMode::Full6D,
         other => other,
     };
 
-    // Solve with the selected solver — don't short-circuit on error so
-    // restarts and fallback solvers get a chance.
-    let mut best = match solve_once(
-        robot,
-        chain,
-        target,
-        &seed,
-        &effective_solver,
-        config,
-        effective_mode,
-    ) {
-        Ok(sol) => sol,
-        Err(_) => IKSolution {
-            joints: seed.to_vec(),
-            position_error: f64::INFINITY,
-            orientation_error: f64::INFINITY,
-            converged: false,
-            iterations: 0,
-            mode_used: effective_mode,
-        degraded: false,
-        condition_number: f64::INFINITY,
-        },
-    };
-
+    let mut best = first_attempt(robot, chain, target, &seed, &effective_solver, config, effective_mode);
     if best.converged {
-        return Ok(best);
+        return Ok(finalize_with_condition_number(best, robot, chain));
     }
 
-    // For analytical solvers (OPW/Subproblem/Subproblem7DOF), fall back to DLS
-    // for restarts since the analytical solver may not suit this robot's geometry.
-    let restart_solver = match &effective_solver {
-        IKSolver::OPW | IKSolver::Subproblem | IKSolver::Subproblem7DOF { .. } => {
-            IKSolver::DLS { damping: 0.05 }
-        }
-        other => other.clone(),
-    };
-
-    // Random restarts with DLS fallback
     if config.num_restarts > 0 {
-        use rand::Rng;
-        let mut rng = rand::thread_rng();
-
-        for _ in 0..config.num_restarts {
-            // Generate random seed within joint limits
-            let random_seed: Vec<f64> = chain
-                .active_joints
-                .iter()
-                .map(|&joint_idx| {
-                    let joint = &robot.joints[joint_idx];
-                    if let Some(limits) = &joint.limits {
-                        let range = limits.upper - limits.lower;
-                        if range.is_finite() && range < 100.0 {
-                            rng.gen_range(limits.lower..=limits.upper)
-                        } else {
-                            // Continuous/very-wide joint
-                            rng.gen_range(-std::f64::consts::PI..=std::f64::consts::PI)
-                        }
-                    } else {
-                        rng.gen_range(-std::f64::consts::PI..=std::f64::consts::PI)
-                    }
-                })
-                .collect();
-
-            if let Ok(solution) = solve_once(
-                robot,
-                chain,
-                target,
-                &random_seed,
-                &restart_solver,
-                config,
-                effective_mode,
-            ) {
-                if solution.converged || solution.position_error < best.position_error {
-                    best = solution;
-                    if best.converged {
-                        break;
-                    }
-                }
-            }
-        }
+        random_restart_loop(robot, chain, target, &restart_solver, config, effective_mode, &mut best);
     }
 
-    // Position-only fallback: if Full6D failed and mode is PositionFallback,
-    // retry with PositionOnly mode
     if !best.converged && config.mode == IKMode::PositionFallback {
-        let fallback_result = solve_once(
-            robot,
-            chain,
-            target,
-            &seed,
-            &restart_solver,
-            config,
-            IKMode::PositionOnly,
-        );
-        if let Ok(sol) = fallback_result {
-            if sol.converged || sol.position_error < best.position_error {
-                best = sol;
-            }
-        }
+        try_position_only_fallback(robot, chain, target, &seed, &restart_solver, config, &mut best);
     }
 
     if !best.converged {
@@ -381,7 +256,169 @@ pub fn solve_ik(
         });
     }
 
-    // Compute Jacobian condition number at solution
+    Ok(finalize_with_condition_number(best, robot, chain))
+}
+
+/// Resolve config.solver=Auto to a concrete solver via robot.ik_preference,
+/// then geometry-based fallback chain (OPW -> Subproblem -> Subproblem7DOF -> DLS).
+fn select_effective_solver(
+    robot: &Robot,
+    chain: &KinematicChain,
+    config: &IKConfig,
+) -> IKSolver {
+    if let IKSolver::Auto = &config.solver {
+        let preferred = robot
+            .ik_preference
+            .as_ref()
+            .map(|p| p.solver.as_str())
+            .unwrap_or("auto");
+
+        match preferred {
+            "opw" if opw::is_opw_compatible(robot, chain) => IKSolver::OPW,
+            "subproblem" if subproblem::is_subproblem_compatible(robot, chain) => {
+                IKSolver::Subproblem
+            }
+            "subproblem7dof" if subproblem::is_subproblem_7dof_compatible(robot, chain) => {
+                IKSolver::Subproblem7DOF { num_samples: 36 }
+            }
+            "fabrik" => IKSolver::FABRIK,
+            "dls" => IKSolver::DLS { damping: 0.05 },
+            // "auto" or preference didn't validate — use geometry-based selection
+            _ => {
+                if opw::is_opw_compatible(robot, chain) {
+                    IKSolver::OPW
+                } else if subproblem::is_subproblem_compatible(robot, chain) {
+                    IKSolver::Subproblem
+                } else if subproblem::is_subproblem_7dof_compatible(robot, chain) {
+                    IKSolver::Subproblem7DOF { num_samples: 36 }
+                } else {
+                    IKSolver::DLS { damping: 0.05 }
+                }
+            }
+        }
+    } else {
+        config.solver.clone()
+    }
+}
+
+/// Pick the solver to use for random-restart attempts. Analytical solvers fall back to DLS
+/// because the analytical solver may not suit this robot's geometry.
+fn restart_solver_for(effective_solver: &IKSolver) -> IKSolver {
+    match effective_solver {
+        IKSolver::OPW | IKSolver::Subproblem | IKSolver::Subproblem7DOF { .. } => {
+            IKSolver::DLS { damping: 0.05 }
+        }
+        other => other.clone(),
+    }
+}
+
+/// First attempt with the given seed. Returns a non-converged stub on error so the
+/// caller can still run restarts / fallbacks.
+fn first_attempt(
+    robot: &Robot,
+    chain: &KinematicChain,
+    target: &Pose,
+    seed: &[f64],
+    solver: &IKSolver,
+    config: &IKConfig,
+    mode: IKMode,
+) -> IKSolution {
+    match solve_once(robot, chain, target, seed, solver, config, mode) {
+        Ok(sol) => sol,
+        Err(_) => IKSolution {
+            joints: seed.to_vec(),
+            position_error: f64::INFINITY,
+            orientation_error: f64::INFINITY,
+            converged: false,
+            iterations: 0,
+            mode_used: mode,
+            degraded: false,
+            condition_number: f64::INFINITY,
+        },
+    }
+}
+
+/// Random-restart loop: try `config.num_restarts` random seeds, keep the best one.
+/// Updates `best` in place; stops early on first convergence.
+fn random_restart_loop(
+    robot: &Robot,
+    chain: &KinematicChain,
+    target: &Pose,
+    restart_solver: &IKSolver,
+    config: &IKConfig,
+    mode: IKMode,
+    best: &mut IKSolution,
+) {
+    let mut rng = rand::thread_rng();
+
+    for _ in 0..config.num_restarts {
+        let seed = sample_random_seed(robot, chain, &mut rng);
+        let Ok(solution) = solve_once(robot, chain, target, &seed, restart_solver, config, mode) else {
+            continue;
+        };
+        if solution.converged || solution.position_error < best.position_error {
+            *best = solution;
+            if best.converged {
+                break;
+            }
+        }
+    }
+}
+
+/// Sample a random configuration within joint limits (or [-pi, pi] for continuous joints).
+fn sample_random_seed<R: rand::Rng>(robot: &Robot, chain: &KinematicChain, rng: &mut R) -> Vec<f64> {
+    chain
+        .active_joints
+        .iter()
+        .map(|&joint_idx| {
+            let joint = &robot.joints[joint_idx];
+            if let Some(limits) = &joint.limits {
+                let range = limits.upper - limits.lower;
+                if range.is_finite() && range < 100.0 {
+                    rng.gen_range(limits.lower..=limits.upper)
+                } else {
+                    // Continuous/very-wide joint
+                    rng.gen_range(-std::f64::consts::PI..=std::f64::consts::PI)
+                }
+            } else {
+                rng.gen_range(-std::f64::consts::PI..=std::f64::consts::PI)
+            }
+        })
+        .collect()
+}
+
+/// PositionFallback path: if Full6D failed, retry with PositionOnly mode using the original seed.
+fn try_position_only_fallback(
+    robot: &Robot,
+    chain: &KinematicChain,
+    target: &Pose,
+    seed: &[f64],
+    restart_solver: &IKSolver,
+    config: &IKConfig,
+    best: &mut IKSolution,
+) {
+    let Ok(sol) = solve_once(
+        robot,
+        chain,
+        target,
+        seed,
+        restart_solver,
+        config,
+        IKMode::PositionOnly,
+    ) else {
+        return;
+    };
+    if sol.converged || sol.position_error < best.position_error {
+        *best = sol;
+    }
+}
+
+/// Compute the Jacobian condition number κ(J) at the solution and stamp it onto the IKSolution.
+fn finalize_with_condition_number(
+    mut best: IKSolution,
+    robot: &Robot,
+    chain: &KinematicChain,
+) -> IKSolution {
     best.condition_number = match crate::jacobian(robot, chain, &best.joints) {
         Ok(j) => {
             let svd = j.svd(false, false);
@@ -406,8 +443,7 @@ pub fn solve_ik(
         }
         Err(_) => f64::INFINITY,
     };
-
-    Ok(best)
+    best
 }
 
 /// Batch IK: solve inverse kinematics for multiple target poses.
