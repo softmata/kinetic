@@ -6,7 +6,7 @@
 use wgpu::util::DeviceExt;
 
 use crate::pipeline::{LightUniforms, LineVertex, MeshVertex, Pipelines};
-use crate::wgpu_renderer::{InstanceData, ViewUniforms};
+use crate::dryrun_renderer::{InstanceData, ViewUniforms};
 use crate::{Camera, MeshData, MeshHandle, MeshRegistry, Projection};
 
 /// A mesh uploaded to the GPU with vertex and index buffers.

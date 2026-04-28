@@ -6,7 +6,7 @@
 
 use crate::gpu_buffers::GpuScene;
 use crate::pipeline::{LightUniforms, Pipelines};
-use crate::wgpu_renderer::ViewUniforms;
+use crate::dryrun_renderer::ViewUniforms;
 use crate::{
     collect_render_commands, Camera, MeshHandle, MeshRegistry, RenderCommand, SceneNode,
     ViewerSettings,
@@ -373,7 +373,7 @@ pub fn diff_image(actual: &[u8], expected: &[u8], width: u32, height: u32) -> Ve
 // --- Internal: reuse draw data building from app.rs ---
 
 use crate::pipeline::LineVertex;
-use crate::wgpu_renderer::InstanceData;
+use crate::dryrun_renderer::InstanceData;
 
 struct DrawBatch {
     mesh_id: usize,

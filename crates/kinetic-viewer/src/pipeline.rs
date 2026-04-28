@@ -4,7 +4,7 @@
 //! and line rendering (unlit colored lines). Also defines the vertex/instance
 //! buffer layouts and uniform bind group layouts.
 
-use crate::wgpu_renderer::{InstanceData, ViewUniforms};
+use crate::dryrun_renderer::{InstanceData, ViewUniforms};
 
 /// Uniform data for lighting, uploaded alongside [`ViewUniforms`].
 #[derive(Debug, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]

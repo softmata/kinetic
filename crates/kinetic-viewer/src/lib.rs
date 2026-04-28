@@ -36,7 +36,7 @@ pub mod test_utils;
 #[cfg(feature = "visual")]
 pub mod trajectory_viz;
 pub mod web_export;
-pub mod wgpu_renderer;
+pub mod dryrun_renderer;
 
 use nalgebra::{Isometry3, Matrix4, Point3, Vector3};
 

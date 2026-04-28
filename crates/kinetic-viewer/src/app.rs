@@ -28,7 +28,7 @@ use crate::interaction::{InteractionManager, PlanningPanel, PlanningStatus};
 use crate::perception_viz::{self, PerceptionManager};
 use crate::pipeline::{LightUniforms, LineVertex, Pipelines};
 use crate::trajectory_viz::{self, TrajectoryVizState};
-use crate::wgpu_renderer::InstanceData;
+use crate::dryrun_renderer::InstanceData;
 use crate::{
     collect_render_commands, update_robot_transforms, Camera, MeshHandle, MeshRegistry,
     RenderCommand, SceneNode, ViewerSettings,
