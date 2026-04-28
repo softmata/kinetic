@@ -156,187 +156,20 @@ pub fn project(
             return Some(q);
         }
 
-        // Apply corrections for each violated constraint
         let mut any_correction = false;
         for constraint in constraints {
-            let d = distance(constraint, robot, chain, &q);
-            if d >= 0.0 {
-                continue; // already satisfied
+            // Skip already-satisfied constraints (positive distance = inside manifold)
+            if distance(constraint, robot, chain, &q) >= 0.0 {
+                continue;
             }
-
-            match constraint {
-                Constraint::Joint {
-                    joint_index,
-                    min,
-                    max,
-                } => {
-                    // Direct projection: clamp
-                    if *joint_index < q.len() {
-                        q[*joint_index] = q[*joint_index].clamp(*min, *max);
-                        any_correction = true;
-                    }
-                }
-
-                Constraint::PositionBound {
-                    link: _,
-                    axis,
-                    min,
-                    max,
-                } => {
-                    // Use Jacobian to correct position
-                    if let Ok(jac) = jacobian(robot, chain, &q) {
-                        let ee_pose = match fk(robot, chain, &q) {
-                            Ok(p) => p,
-                            Err(_) => continue,
-                        };
-                        let pos = ee_pose.0.translation.vector;
-                        let (row, val) = match axis {
-                            kinetic_core::Axis::X => (0, pos.x),
-                            kinetic_core::Axis::Y => (1, pos.y),
-                            kinetic_core::Axis::Z => (2, pos.z),
-                        };
-                        let correction = if val < *min {
-                            min - val
-                        } else if val > *max {
-                            max - val
-                        } else {
-                            continue;
-                        };
-
-                        // dq = J_row^T * correction / ||J_row||²
-                        let j_row = jac.row(row);
-                        let j_row_norm_sq: f64 = j_row.iter().map(|v| v * v).sum();
-                        if j_row_norm_sq > 1e-12 {
-                            for (i, j_val) in j_row.iter().enumerate() {
-                                if i < q.len() {
-                                    q[i] += j_val * correction / j_row_norm_sq;
-                                }
-                            }
-                            any_correction = true;
-                        }
-                    }
-                }
-
-                Constraint::Orientation {
-                    link: _,
-                    axis: ref_axis,
-                    tolerance,
-                } => {
-                    // Use Jacobian orientation rows to correct
-                    if let Ok(jac) = jacobian(robot, chain, &q) {
-                        let ee_pose = match fk(robot, chain, &q) {
-                            Ok(p) => p,
-                            Err(_) => continue,
-                        };
-                        let link_z = ee_pose.0.rotation * nalgebra::Vector3::z();
-                        let cos_angle = link_z.dot(ref_axis).clamp(-1.0, 1.0);
-                        let angle = cos_angle.acos();
-                        if angle <= *tolerance {
-                            continue;
-                        }
-
-                        // Rotation correction axis
-                        let cross = link_z.cross(ref_axis);
-                        let cross_norm = cross.norm();
-                        if cross_norm < 1e-10 {
-                            continue;
-                        }
-                        let correction_axis = cross / cross_norm;
-                        let correction_angle = angle - tolerance;
-
-                        // Build task-space correction (orientation only: rows 3-5)
-                        let mut task_correction = DVector::zeros(6);
-                        task_correction[3] = correction_axis.x * correction_angle;
-                        task_correction[4] = correction_axis.y * correction_angle;
-                        task_correction[5] = correction_axis.z * correction_angle;
-
-                        // dq = J^+ * task_correction (use transpose for simplicity)
-                        let jt = jac.transpose();
-                        let dq = &jt * &task_correction;
-                        let dq_norm = dq.norm();
-                        let scale = if dq_norm > 0.1 { 0.1 / dq_norm } else { 1.0 };
-                        for (i, dq_val) in dq.iter().enumerate() {
-                            if i < q.len() {
-                                q[i] += dq_val * scale;
-                            }
-                        }
-                        any_correction = true;
-                    }
-                }
-
-                Constraint::Visibility {
-                    sensor_link: _,
-                    target: _,
-                    cone_angle: _,
-                } => {
-                    // Similar to orientation: rotate sensor to point at target
-                    // Use Jacobian angular rows to correct
-                    if let Ok(jac) = jacobian(robot, chain, &q) {
-                        let link_poses = match forward_kinematics_all(robot, chain, &q) {
-                            Ok(p) => p,
-                            Err(_) => continue,
-                        };
-                        let Constraint::Visibility {
-                            sensor_link,
-                            target,
-                            ..
-                        } = constraint
-                        else {
-                            continue;
-                        };
-                        let link_idx = match robot.links.iter().position(|l| l.name == *sensor_link)
-                        {
-                            Some(i) => i,
-                            None => continue,
-                        };
-                        if link_idx >= link_poses.len() {
-                            continue;
-                        }
-                        let sensor_pose = &link_poses[link_idx];
-                        let sensor_pos = sensor_pose.0.translation.vector;
-                        let sensor_fwd = sensor_pose.0.rotation * nalgebra::Vector3::z();
-                        let to_target = target - sensor_pos;
-                        let to_target_norm = to_target.norm();
-                        if to_target_norm < 1e-10 {
-                            continue;
-                        }
-                        let desired_dir = to_target / to_target_norm;
-
-                        // Rotation to align sensor forward with desired direction
-                        let cross = sensor_fwd.cross(&desired_dir);
-                        let cross_norm = cross.norm();
-                        if cross_norm < 1e-10 {
-                            continue;
-                        }
-                        let correction_axis = cross / cross_norm;
-                        let cos_angle = sensor_fwd.dot(&desired_dir).clamp(-1.0, 1.0);
-                        let correction_angle = cos_angle.acos() * 0.5; // partial correction
-
-                        let mut task_correction = DVector::zeros(6);
-                        task_correction[3] = correction_axis.x * correction_angle;
-                        task_correction[4] = correction_axis.y * correction_angle;
-                        task_correction[5] = correction_axis.z * correction_angle;
-
-                        let jt = jac.transpose();
-                        let dq = &jt * &task_correction;
-                        let dq_norm = dq.norm();
-                        let scale = if dq_norm > 0.1 { 0.1 / dq_norm } else { 1.0 };
-                        for (i, dq_val) in dq.iter().enumerate() {
-                            if i < q.len() {
-                                q[i] += dq_val * scale;
-                            }
-                        }
-                        any_correction = true;
-                    }
-                }
+            if apply_correction(constraint, robot, chain, &mut q) {
+                any_correction = true;
             }
         }
 
         if !any_correction {
             break;
         }
-
-        // Clamp to joint limits
         clamp_to_joint_limits(robot, chain, &mut q);
     }
 
@@ -344,6 +177,179 @@ pub fn project(
         Some(q)
     } else {
         None
+    }
+}
+
+/// Dispatch to the per-constraint corrector. Returns `true` if a correction was applied.
+fn apply_correction(
+    constraint: &Constraint,
+    robot: &Robot,
+    chain: &KinematicChain,
+    q: &mut Vec<f64>,
+) -> bool {
+    match constraint {
+        Constraint::Joint {
+            joint_index,
+            min,
+            max,
+        } => correct_joint(*joint_index, *min, *max, q),
+        Constraint::PositionBound {
+            link: _,
+            axis,
+            min,
+            max,
+        } => correct_position_bound(robot, chain, *axis, *min, *max, q),
+        Constraint::Orientation {
+            link: _,
+            axis: ref_axis,
+            tolerance,
+        } => correct_orientation(robot, chain, ref_axis, *tolerance, q),
+        Constraint::Visibility {
+            sensor_link,
+            target,
+            cone_angle: _,
+        } => correct_visibility(robot, chain, sensor_link, target, q),
+    }
+}
+
+/// Joint constraint: clamp q[joint_index] into [min, max].
+fn correct_joint(joint_index: usize, min: f64, max: f64, q: &mut [f64]) -> bool {
+    if joint_index >= q.len() {
+        return false;
+    }
+    q[joint_index] = q[joint_index].clamp(min, max);
+    true
+}
+
+/// Position-bound constraint: nudge along the Jacobian row to bring the EE into [min, max] on `axis`.
+fn correct_position_bound(
+    robot: &Robot,
+    chain: &KinematicChain,
+    axis: kinetic_core::Axis,
+    min: f64,
+    max: f64,
+    q: &mut [f64],
+) -> bool {
+    let Ok(jac) = jacobian(robot, chain, q) else { return false };
+    let Ok(ee_pose) = fk(robot, chain, q) else { return false };
+    let pos = ee_pose.0.translation.vector;
+    let (row, val) = match axis {
+        kinetic_core::Axis::X => (0, pos.x),
+        kinetic_core::Axis::Y => (1, pos.y),
+        kinetic_core::Axis::Z => (2, pos.z),
+    };
+    let correction = if val < min {
+        min - val
+    } else if val > max {
+        max - val
+    } else {
+        return false;
+    };
+
+    // dq = J_row^T * correction / ||J_row||²
+    let j_row = jac.row(row);
+    let j_row_norm_sq: f64 = j_row.iter().map(|v| v * v).sum();
+    if j_row_norm_sq <= 1e-12 {
+        return false;
+    }
+    for (i, j_val) in j_row.iter().enumerate() {
+        if i < q.len() {
+            q[i] += j_val * correction / j_row_norm_sq;
+        }
+    }
+    true
+}
+
+/// Orientation constraint: rotate end-effector Z toward `ref_axis` until within `tolerance`.
+fn correct_orientation(
+    robot: &Robot,
+    chain: &KinematicChain,
+    ref_axis: &nalgebra::Vector3<f64>,
+    tolerance: f64,
+    q: &mut [f64],
+) -> bool {
+    let Ok(jac) = jacobian(robot, chain, q) else { return false };
+    let Ok(ee_pose) = fk(robot, chain, q) else { return false };
+    let link_z = ee_pose.0.rotation * nalgebra::Vector3::z();
+    let cos_angle = link_z.dot(ref_axis).clamp(-1.0, 1.0);
+    let angle = cos_angle.acos();
+    if angle <= tolerance {
+        return false;
+    }
+
+    let cross = link_z.cross(ref_axis);
+    let cross_norm = cross.norm();
+    if cross_norm < 1e-10 {
+        return false;
+    }
+    let correction_axis = cross / cross_norm;
+    let correction_angle = angle - tolerance;
+
+    apply_angular_jacobian_correction(&jac, &correction_axis, correction_angle, q);
+    true
+}
+
+/// Visibility constraint: rotate sensor's forward (Z) axis toward the target point.
+fn correct_visibility(
+    robot: &Robot,
+    chain: &KinematicChain,
+    sensor_link: &str,
+    target: &nalgebra::Vector3<f64>,
+    q: &mut [f64],
+) -> bool {
+    let Ok(jac) = jacobian(robot, chain, q) else { return false };
+    let Ok(link_poses) = forward_kinematics_all(robot, chain, q) else { return false };
+    let Some(link_idx) = robot.links.iter().position(|l| l.name == sensor_link) else {
+        return false;
+    };
+    if link_idx >= link_poses.len() {
+        return false;
+    }
+
+    let sensor_pose = &link_poses[link_idx];
+    let sensor_pos = sensor_pose.0.translation.vector;
+    let sensor_fwd = sensor_pose.0.rotation * nalgebra::Vector3::z();
+    let to_target = target - sensor_pos;
+    let to_target_norm = to_target.norm();
+    if to_target_norm < 1e-10 {
+        return false;
+    }
+    let desired_dir = to_target / to_target_norm;
+
+    let cross = sensor_fwd.cross(&desired_dir);
+    let cross_norm = cross.norm();
+    if cross_norm < 1e-10 {
+        return false;
+    }
+    let correction_axis = cross / cross_norm;
+    let cos_angle = sensor_fwd.dot(&desired_dir).clamp(-1.0, 1.0);
+    let correction_angle = cos_angle.acos() * 0.5; // partial correction
+
+    apply_angular_jacobian_correction(&jac, &correction_axis, correction_angle, q);
+    true
+}
+
+/// Apply an angular task-space correction (rows 3-5 of the Jacobian) to joint vector q.
+/// Step is capped at 0.1 rad so the iteration stays stable.
+fn apply_angular_jacobian_correction(
+    jac: &nalgebra::DMatrix<f64>,
+    correction_axis: &nalgebra::Vector3<f64>,
+    correction_angle: f64,
+    q: &mut [f64],
+) {
+    let mut task_correction = DVector::zeros(6);
+    task_correction[3] = correction_axis.x * correction_angle;
+    task_correction[4] = correction_axis.y * correction_angle;
+    task_correction[5] = correction_axis.z * correction_angle;
+
+    let jt = jac.transpose();
+    let dq = &jt * &task_correction;
+    let dq_norm = dq.norm();
+    let scale = if dq_norm > 0.1 { 0.1 / dq_norm } else { 1.0 };
+    for (i, dq_val) in dq.iter().enumerate() {
+        if i < q.len() {
+            q[i] += dq_val * scale;
+        }
     }
 }
 
