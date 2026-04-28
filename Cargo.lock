@@ -1701,6 +1701,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kinetic-perception"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "kinetic-core",
+ "nalgebra",
+]
+
+[[package]]
 name = "kinetic-planning"
 version = "0.1.0"
 dependencies = [

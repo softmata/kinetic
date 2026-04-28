@@ -125,7 +125,7 @@ PyBullet's IK and motion planning functionality.
 | `setCollisionFilter` | `AllowedCollisionMatrix` |
 
 **Key difference:** PyBullet is a simulator with basic IK (damped least squares).
-Kinetic is a planning stack with 10 IK solvers, 14 planners, and GPU optimization.
+Kinetic is a planning stack with 10 IK solvers, 14 planners (8 surfaced in Python), and GPU optimization.
 PyBullet runs in Python; kinetic's core is Rust with Python bindings.
 
 **Comparison:**
@@ -186,7 +186,7 @@ pose = planner.fk(q)
 |---------|---------|---------|--------|-------|------|----------|-----------|
 | Language | Rust | C++ | Python | C++ | C++ | Python | C++ |
 | FK/IK | Built-in | Plugin | Built-in | Built-in | External | Basic | Built-in |
-| Planning | 14 planners | OMPL | Optimizer | GCS/Opt | Planners | None | None |
+| Planning | 14 (8 in Py) | OMPL | Optimizer | GCS/Opt | Planners | None | None |
 | Collision | SIMD spheres | FCL | CUDA SDF | Drake | External | Bullet | HPP-FCL |
 | GPU | wgpu | No | CUDA | No | No | No | No |
 | Dynamics | No | No | No | Yes | No | Yes | Yes |
