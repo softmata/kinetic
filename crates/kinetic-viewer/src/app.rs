@@ -430,78 +430,10 @@ fn render_frame(state: &mut GpuState, camera: &Camera, robot: &kinetic_robot::Ro
     let dt = now.duration_since(state.last_frame_time).as_secs_f64();
     state.last_frame_time = now;
 
-    // --- Trajectory playback → FK update ---
-    if let Some(player) = &mut state.trajectory_viz.player {
-        if player.is_playing() {
-            let joints = player.tick(dt);
-            for (i, v) in joints.as_slice().iter().enumerate() {
-                if i < state.joint_values.len() { state.joint_values[i] = *v; }
-            }
-        }
-    }
-
-    // --- Servo: send twist each frame when active (Gap 1) ---
-    if let Some(servo) = &mut state.servo {
-        let twist_arr = state.interaction.servo.twist;
-        let twist = kinetic_core::Twist::from_slice(&twist_arr);
-        // Sync servo state from current joint values
-        let zeros = vec![0.0; state.joint_values.len()];
-        let _ = servo.set_state(&state.joint_values, &zeros);
-        match servo.send_twist(&twist) {
-            Ok(cmd) => {
-                for (i, &pos) in cmd.positions.iter().enumerate() {
-                    if i < state.joint_values.len() {
-                        state.joint_values[i] = pos;
-                    }
-                }
-                // Update servo overlay status from servo state
-                let ss = servo.state();
-                state.interaction.servo.collision_distance = ss.min_obstacle_distance;
-                state.interaction.servo.near_singularity = ss.is_near_singularity;
-                state.interaction.servo.velocity_magnitude = twist.linear_magnitude();
-            }
-            Err(_) => {
-                // Emergency stop or other error — keep current joints
-            }
-        }
-    }
-
-    // --- Poll async planning result (Gap 2) ---
-    if state.planning_thread_active {
-        // GAP 13: Timeout check — fail if planning exceeds 30 seconds
-        if state.planning_start_time.elapsed().as_secs() > 30 {
-            state.planning_thread_active = false;
-            state.planning_panel.status = PlanningStatus::Failed("Planning timed out".into());
-        }
-        let mut result_lock = state.planning_result.lock().unwrap();
-        if let Some(result) = result_lock.take() {
-            state.planning_thread_active = false;
-            match result {
-                Ok(plan_result) => {
-                    state.planning_panel.status = PlanningStatus::Succeeded;
-                    state.planning_panel.last_planning_time = Some(plan_result.planning_time);
-                    let dof = plan_result.waypoints.first().map_or(0, |w| w.len());
-                    let mut traj = kinetic_core::Trajectory::with_dof(dof);
-                    for wp in &plan_result.waypoints {
-                        traj.push_waypoint(wp);
-                    }
-                    state.trajectory_viz.set_trajectory(traj, &state.planning_panel.planner_id);
-                }
-                Err(e) => {
-                    state.planning_panel.status = PlanningStatus::Failed(format!("{e}"));
-                }
-            }
-        }
-    }
-
-    // --- FK from current joint values ---
-    if let Ok(poses) = forward_kinematics_all(robot, &state.chain, &state.joint_values) {
-        state.link_poses = poses;
-        update_robot_transforms(&mut state.scene_root, &state.link_poses);
-    }
-
-    // --- Collision checking (generates viz data for debug overlay) ---
-    state.collision_viz_data = build_collision_viz(&state.sphere_model, &state.link_poses);
+    update_trajectory_playback(state, dt);
+    update_servo_frame(state);
+    poll_async_planning(state);
+    update_fk_and_collision_viz(state, robot);
 
     // --- Surface ---
     let output = match state.gpu.surface.get_current_texture() {
@@ -520,64 +452,10 @@ fn render_frame(state: &mut GpuState, camera: &Camera, robot: &kinetic_robot::Ro
     state.scene.update_view_uniforms(&state.gpu.queue, &view_uniforms);
     state.scene.update_light_uniforms(&state.gpu.queue, &LightUniforms::default());
 
-    // --- 3D commands ---
-    let mut commands = Vec::new();
-    // GAP 4: Gate robot rendering behind show_robot
-    if state.settings.show_robot {
-        collect_render_commands(&state.scene_root, &Matrix4::identity(), &mut commands);
-    }
-    if state.settings.show_grid {
-        commands.push(RenderCommand::DrawGrid { size: state.settings.grid_size, divisions: state.settings.grid_divisions });
-    }
-    if state.settings.show_axes {
-        commands.push(RenderCommand::DrawAxes { length: 0.5 });
-    }
-
+    let mut commands = collect_3d_commands(state);
     let (batches, mut line_vertices) = build_draw_data(&commands);
-
-    // Gizmo
-    if let Some(marker) = state.interaction.markers.get("goal") {
-        let pos = marker.position();
-        let c = [pos[0] as f32, pos[1] as f32, pos[2] as f32];
-        line_vertices.extend(gizmo::translation_gizmo_lines(c, 0.15));
-        line_vertices.extend(gizmo::rotation_gizmo_lines(c, 0.12, 24));
-    }
-    // Trajectory trails
-    if state.settings.show_trajectory_trail { line_vertices.extend(state.trajectory_viz.collect_trail_lines()); }
-    // Collision viz — gated behind show_collision_geometry (GAP 5)
-    if state.settings.show_collision_geometry {
-        line_vertices.extend(collision_viz::collect_collision_lines(&state.collision_viz_data, &state.collision_viz_config));
-    }
-    // Octree
-    if state.settings.show_voxels { line_vertices.extend(state.perception.collect_octree_lines()); }
-    // Point clouds (GAP 3)
-    if state.settings.show_point_cloud { line_vertices.extend(state.perception.collect_point_cloud_lines()); }
-
-    // Ghost robots: render translucent copies at trajectory start and goal poses.
-    if state.trajectory_viz.show_ghosts {
-        if let Some(ref player) = state.trajectory_viz.player {
-            let ghost_configs: [(f64, [f32; 4]); 2] = [
-                (0.0, [0.2, 0.8, 0.2, 0.3]), // start ghost — green transparent
-                (1.0, [0.2, 0.4, 1.0, 0.3]), // goal ghost — blue transparent
-            ];
-            for (ghost_t, ghost_color) in ghost_configs {
-                let ghost_joints = player.trajectory().sample(ghost_t);
-                if let Ok(ghost_poses) = forward_kinematics_all(robot, &state.chain, ghost_joints.as_slice()) {
-                    update_robot_transforms(&mut state.scene_root, &ghost_poses);
-                    let mut ghost_cmds = Vec::new();
-                    collect_render_commands(&state.scene_root, &Matrix4::identity(), &mut ghost_cmds);
-                    for cmd in &mut ghost_cmds {
-                        if let RenderCommand::DrawMesh { material, .. } = cmd {
-                            material.color = ghost_color;
-                        }
-                    }
-                    commands.extend(ghost_cmds);
-                }
-            }
-            // Restore original link poses and transforms
-            update_robot_transforms(&mut state.scene_root, &state.link_poses);
-        }
-    }
+    collect_line_overlays(state, &mut line_vertices);
+    add_ghost_robots(state, robot, &mut commands);
 
     let line_count = state.scene.write_lines(&state.gpu.device, &state.gpu.queue, &line_vertices);
 
@@ -655,6 +533,159 @@ fn render_frame(state: &mut GpuState, camera: &Camera, robot: &kinetic_robot::Ro
     state.gpu.queue.submit(egui_bufs.into_iter().chain(std::iter::once(encoder.finish())));
     output.present();
     for id in &egui_output.textures_delta.free { state.egui_renderer.free_texture(id); }
+}
+
+/// Advance trajectory playback and write sampled joints into `state.joint_values`.
+fn update_trajectory_playback(state: &mut GpuState, dt: f64) {
+    if let Some(player) = &mut state.trajectory_viz.player {
+        if player.is_playing() {
+            let joints = player.tick(dt);
+            for (i, v) in joints.as_slice().iter().enumerate() {
+                if i < state.joint_values.len() { state.joint_values[i] = *v; }
+            }
+        }
+    }
+}
+
+/// Drive servo with the current twist command and sync overlay status.
+fn update_servo_frame(state: &mut GpuState) {
+    let Some(servo) = &mut state.servo else { return };
+    let twist_arr = state.interaction.servo.twist;
+    let twist = kinetic_core::Twist::from_slice(&twist_arr);
+    // Sync servo state from current joint values
+    let zeros = vec![0.0; state.joint_values.len()];
+    let _ = servo.set_state(&state.joint_values, &zeros);
+    match servo.send_twist(&twist) {
+        Ok(cmd) => {
+            for (i, &pos) in cmd.positions.iter().enumerate() {
+                if i < state.joint_values.len() {
+                    state.joint_values[i] = pos;
+                }
+            }
+            // Update servo overlay status from servo state
+            let ss = servo.state();
+            state.interaction.servo.collision_distance = ss.min_obstacle_distance;
+            state.interaction.servo.near_singularity = ss.is_near_singularity;
+            state.interaction.servo.velocity_magnitude = twist.linear_magnitude();
+        }
+        Err(_) => {
+            // Emergency stop or other error — keep current joints
+        }
+    }
+}
+
+/// Poll the background planning thread; on completion, populate the trajectory viz.
+fn poll_async_planning(state: &mut GpuState) {
+    if !state.planning_thread_active { return }
+    // GAP 13: Timeout check — fail if planning exceeds 30 seconds
+    if state.planning_start_time.elapsed().as_secs() > 30 {
+        state.planning_thread_active = false;
+        state.planning_panel.status = PlanningStatus::Failed("Planning timed out".into());
+    }
+    let mut result_lock = state.planning_result.lock().unwrap();
+    if let Some(result) = result_lock.take() {
+        state.planning_thread_active = false;
+        match result {
+            Ok(plan_result) => {
+                state.planning_panel.status = PlanningStatus::Succeeded;
+                state.planning_panel.last_planning_time = Some(plan_result.planning_time);
+                let dof = plan_result.waypoints.first().map_or(0, |w| w.len());
+                let mut traj = kinetic_core::Trajectory::with_dof(dof);
+                for wp in &plan_result.waypoints {
+                    traj.push_waypoint(wp);
+                }
+                state.trajectory_viz.set_trajectory(traj, &state.planning_panel.planner_id);
+            }
+            Err(e) => {
+                state.planning_panel.status = PlanningStatus::Failed(format!("{e}"));
+            }
+        }
+    }
+}
+
+/// Recompute FK from current joint values, refresh scene transforms and collision viz.
+fn update_fk_and_collision_viz(state: &mut GpuState, robot: &kinetic_robot::Robot) {
+    if let Ok(poses) = forward_kinematics_all(robot, &state.chain, &state.joint_values) {
+        state.link_poses = poses;
+        update_robot_transforms(&mut state.scene_root, &state.link_poses);
+    }
+    state.collision_viz_data = build_collision_viz(&state.sphere_model, &state.link_poses);
+}
+
+/// Collect 3D mesh draw commands for the robot, grid, and axes (gated by ViewerSettings).
+fn collect_3d_commands(state: &GpuState) -> Vec<RenderCommand> {
+    let mut commands = Vec::new();
+    if state.settings.show_robot {
+        collect_render_commands(&state.scene_root, &Matrix4::identity(), &mut commands);
+    }
+    if state.settings.show_grid {
+        commands.push(RenderCommand::DrawGrid {
+            size: state.settings.grid_size,
+            divisions: state.settings.grid_divisions,
+        });
+    }
+    if state.settings.show_axes {
+        commands.push(RenderCommand::DrawAxes { length: 0.5 });
+    }
+    commands
+}
+
+/// Append line-list overlays (gizmo, trail, collision viz, octree, point clouds).
+fn collect_line_overlays(state: &GpuState, line_vertices: &mut Vec<LineVertex>) {
+    if let Some(marker) = state.interaction.markers.get("goal") {
+        let pos = marker.position();
+        let c = [pos[0] as f32, pos[1] as f32, pos[2] as f32];
+        line_vertices.extend(gizmo::translation_gizmo_lines(c, 0.15));
+        line_vertices.extend(gizmo::rotation_gizmo_lines(c, 0.12, 24));
+    }
+    if state.settings.show_trajectory_trail {
+        line_vertices.extend(state.trajectory_viz.collect_trail_lines());
+    }
+    // GAP 5: gated behind show_collision_geometry
+    if state.settings.show_collision_geometry {
+        line_vertices.extend(collision_viz::collect_collision_lines(
+            &state.collision_viz_data,
+            &state.collision_viz_config,
+        ));
+    }
+    if state.settings.show_voxels {
+        line_vertices.extend(state.perception.collect_octree_lines());
+    }
+    // GAP 3: point clouds
+    if state.settings.show_point_cloud {
+        line_vertices.extend(state.perception.collect_point_cloud_lines());
+    }
+}
+
+/// Append translucent ghost robot copies at trajectory start (t=0) and goal (t=1).
+fn add_ghost_robots(
+    state: &mut GpuState,
+    robot: &kinetic_robot::Robot,
+    commands: &mut Vec<RenderCommand>,
+) {
+    if !state.trajectory_viz.show_ghosts { return }
+    let Some(player) = state.trajectory_viz.player.as_ref() else { return };
+    let ghost_configs: [(f64, [f32; 4]); 2] = [
+        (0.0, [0.2, 0.8, 0.2, 0.3]), // start ghost — green transparent
+        (1.0, [0.2, 0.4, 1.0, 0.3]), // goal ghost — blue transparent
+    ];
+    let trajectory = player.trajectory().clone();
+    for (ghost_t, ghost_color) in ghost_configs {
+        let ghost_joints = trajectory.sample(ghost_t);
+        if let Ok(ghost_poses) = forward_kinematics_all(robot, &state.chain, ghost_joints.as_slice()) {
+            update_robot_transforms(&mut state.scene_root, &ghost_poses);
+            let mut ghost_cmds = Vec::new();
+            collect_render_commands(&state.scene_root, &Matrix4::identity(), &mut ghost_cmds);
+            for cmd in &mut ghost_cmds {
+                if let RenderCommand::DrawMesh { material, .. } = cmd {
+                    material.color = ghost_color;
+                }
+            }
+            commands.extend(ghost_cmds);
+        }
+    }
+    // Restore original link poses and transforms
+    update_robot_transforms(&mut state.scene_root, &state.link_poses);
 }
 
 fn draw_egui_panels(ctx: &egui::Context, state: &mut GpuState, robot: &kinetic_robot::Robot) {
