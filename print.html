@@ -9,7 +9,7 @@
 
         <!-- Custom HTML head -->
 
-        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 54 robots, GPU optimization.">
+        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 52 robots, GPU optimization.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-39d86195.js";
+            window.path_to_searchindex_js = "searchindex-e21be642.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-2f1c048c.js"></script>
@@ -222,7 +222,7 @@ traj = kinetic.plan("ur5e", start, kinetic.Goal.joints([1.0, -0.5, 0.3, 0.2, -0.
 <pre class="mermaid">graph LR
     subgraph Foundation
         Core[kinetic-core&lt;br/&gt;Pose, Goal, Trajectory]
-        Robot[kinetic-robot&lt;br/&gt;URDF, 54 robots]
+        Robot[kinetic-robot&lt;br/&gt;URDF, 52 robots]
     end
 
     subgraph Physics
@@ -509,7 +509,7 @@ if home is not None:
 <span class="boring">}</span></code></pre>
 <p>See the <a href="#custom-robots">Custom Robots</a> guide for creating a full kinetic configuration.</p>
 <h2 id="available-robots"><a class="header" href="#available-robots">Available Robots</a></h2>
-<p>See the <a href="#supported-robots">Supported Robots</a> reference for the complete list of 54 built-in robots with manufacturer, DOF, and IK solver.</p>
+<p>See the <a href="#supported-robots">Supported Robots</a> reference for the complete list of 52 built-in robots with manufacturer, DOF, and IK solver.</p>
 <p>A quick sample:</p>
 <div class="table-wrapper">
 <table>
@@ -912,7 +912,7 @@ joints_at_halfway = traj.sample(traj.duration / 2)
 (Unified Robot Description Format) – an XML file that describes every
 link’s shape, every joint’s type and limits, and how they connect. Think
 of it as a blueprint.</p>
-<p>Kinetic ships 54 built-in robots so you don’t need to write URDF files.
+<p>Kinetic ships 52 built-in robots so you don’t need to write URDF files.
 Just say <code>Robot("ur5e")</code> and it loads everything.</p>
 <h2 id="putting-it-all-together"><a class="header" href="#putting-it-all-together">Putting it all together</a></h2>
 <p>A typical robotics workflow in kinetic:</p>
@@ -4250,7 +4250,7 @@ import numpy as np
 </code></pre>
 <p>All functions that accept or return arrays use <code>numpy.ndarray</code>.</p>
 <h2 id="load-a-robot"><a class="header" href="#load-a-robot">Load a robot</a></h2>
-<p>kinetic ships 54 built-in robots. Load one by name:</p>
+<p>kinetic ships 52 built-in robots. Load one by name:</p>
 <pre><code class="language-python">robot = kinetic.Robot("ur5e")
 
 print(robot.name)        # "ur5e"
@@ -4319,7 +4319,7 @@ print(f"{traj.num_waypoints} waypoints, {traj.duration:.2f}s")
 <pre><code class="language-python">planner = kinetic.Planner(robot)
 traj = planner.plan(start, goal)
 </code></pre>
-<p>Choose from 9 planner algorithms:</p>
+<p>Choose from 8 planner algorithms:</p>
 <pre><code class="language-python">planner = kinetic.Planner(robot, planner_type="rrt_star")  # asymptotically optimal
 # Options: rrt_connect (default), rrt_star, bi_rrt_star, bitrrt, est, kpiece, prm, gcs
 </code></pre>
@@ -7503,8 +7503,11 @@ scene.attach("tool", kinetic.Shape.sphere(0.02), grasp_tf, "tool0")
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Rust
+use std::sync::Arc;
 use kinetic::reactive::{Servo, ServoConfig};
-let servo = Servo::new(&amp;robot, &amp;scene, ServoConfig::teleop());
+let robot = Arc::new(robot);
+let scene = Arc::new(scene);
+let servo = Servo::new(&amp;robot, &amp;scene, ServoConfig::teleop())?;
 let cmd = servo.send_twist(&amp;twist)?;
 // cmd.positions, cmd.velocities
 <span class="boring">}</span></code></pre>
@@ -8386,7 +8389,7 @@ pip install kinetic
 <pre><code class="language-python">import kinetic
 
 # Robot &amp; Kinematics
-kinetic.Robot(name)                          # Load robot (54 built-in configs)
+kinetic.Robot(name)                          # Load robot (52 built-in configs)
 robot.fk(joints)                             # Forward kinematics → 4x4
 robot.ik(target_4x4)                         # Inverse kinematics → joints
 robot.ik_config(target, solver="opw", ...)   # IK with full config

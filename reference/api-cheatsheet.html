@@ -8,7 +8,7 @@
 
         <!-- Custom HTML head -->
 
-        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 54 robots, GPU optimization.">
+        <meta name="description" content="Fast, Rust-native motion planning for robotics. 10 IK solvers, 14 planners, SIMD collision, 52 robots, GPU optimization.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "navy";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-39d86195.js";
+            window.path_to_searchindex_js = "../searchindex-e21be642.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-2f1c048c.js"></script>
@@ -299,8 +299,11 @@ scene.attach("tool", kinetic.Shape.sphere(0.02), grasp_tf, "tool0")
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Rust
+use std::sync::Arc;
 use kinetic::reactive::{Servo, ServoConfig};
-let servo = Servo::new(&amp;robot, &amp;scene, ServoConfig::teleop());
+let robot = Arc::new(robot);
+let scene = Arc::new(scene);
+let servo = Servo::new(&amp;robot, &amp;scene, ServoConfig::teleop())?;
 let cmd = servo.send_twist(&amp;twist)?;
 // cmd.positions, cmd.velocities
 <span class="boring">}</span></code></pre>
